@@ -9,7 +9,7 @@
         function keyDown(e) { 
             var keycode = e.which; 
             var realkey = String.fromCharCode(e.which); 
-            var t="keycode: " + keycode + " charcode: " + realkey;
+            var t="hh keycode: " + keycode + " charcode: " + realkey;
             dbg(t);
             //if(keycode==68){ //D pressed
             var aj = $.ajax( { 
@@ -21,7 +21,11 @@
                     // view("修改成功！");    
                     dbg("修改成功！");    
                     }else{    
-                    $("#content").text(data);
+                    $("#content").text(unescape(data));
+                    //convert string to json object,and eval also change unicaode(\ue342 ...) to utf8
+                    job=eval ("(" + data + ")"); 
+                    $("#coname").text(job.coname);
+                    $("#job").text(job.job);
                     }    
                 },
                 error:function(){
@@ -33,6 +37,11 @@
             //alert("keycode: " + keycode + " charcode: " + realkey); 
         } 
         document.onkeydown = keyDown;
+        function test(){
+            //dbg(unescape("{\u82e5\u9690\u82e5\u73b0}"))
+            //dbg(unescape("\u5408\u80a5\u4e2d\u7ee7\u4fe1\u606f\u79d1\u6280\u6709\u9650\u516c\u53f8"))
+            //dbg(unescape("Android\u8f6f\u4ef6\u5f00\u53d1\u5de5\u7a0b\u5e08"))
+        }
         </script>
     </head>
     
@@ -41,5 +50,10 @@
             console2
         </p>
         <p id='content' >content</p>
+        <button onclick='test()'>test2</button>
+        <p>Company</p>
+        <p id='coname'></p>
+        <p>Job</p>
+        <p id='job'></p>
     </body>
 </html>

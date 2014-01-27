@@ -17,7 +17,9 @@ settings.configure( DATABASES = {
 
 import sys
 sys.path.append("/home/sin/wkspace/webserver/django/mysite/")
+sys.path.append("/home/sin/wkspace/soft/python/pub/utility/")
 from jobfind.models import Job
+from uty import models2json
 
 class JobDbOpr():
     def isJobExist(self,job):
@@ -36,6 +38,7 @@ class JobDbOpr():
 
     def initjob(self,job,jburl,local,comp,compurl,jobdescribe,updata):
         j=Job()
+        j.id=5
         j.job=job
         j.jobu=jburl
         j.local=local
@@ -44,24 +47,6 @@ class JobDbOpr():
         j.jd=jobdescribe
         j.updata=updata
         return j
-
-def models2json(m):
-    return simplejson.JSONEncoder().encode(str(obj2dict(m)))
-
-def obj2dict(obj):
-    """ 
-    summary:
-        change object to dict
-    """
-    memberlist = [m for m in dir(obj)]
-    _dict = {}
-    exclude_attr=['objects','DoesNotExist','MultipleObjectsReturned','clean','delete','pk','save']
-    for m in memberlist:
-        if m not in exclude_attr and m.find("_") == -1 and not callable(m):
-            print m
-            _dict[m] = getattr(obj,m)
-
-    return _dict
 
 
 if __name__ == "__main__" :
@@ -74,8 +59,7 @@ if __name__ == "__main__" :
     #jobopr.add(ed_user)
     #jobopr.add(ed_user)
     
-    print models2json(ed_user)
-
+    print models2json(ed_user).encode('utf-8')
 
 
 
