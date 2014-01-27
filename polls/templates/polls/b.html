@@ -1,0 +1,22 @@
+<html>
+    <head>
+        <script type="text/javascript" src="../../../static/js/jquery-1.10.1.js"></script>
+        </script>
+        <script language="javascript">
+        function keyDown(e) { 
+            var keycode = e.which; 
+            var realkey = String.fromCharCode(e.which); 
+            var t="keycode: " + keycode + " charcode: " + realkey;
+            $("#console").text(t);
+            //alert("keycode: " + keycode + " charcode: " + realkey); 
+        } 
+        document.onkeydown = keyDown;
+        </script>
+    </head>
+    
+    <body  class='bodybkgrd'>
+        <p id="console">
+            console poll
+        </p>
+    </body>
+</html>

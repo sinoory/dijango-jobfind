@@ -1,0 +1,45 @@
+<html>
+    <head>
+        <script type="text/javascript" src="../../../static/js/jquery-1.10.1.js"></script>
+        </script>
+        <script language="javascript">
+        function dbg(msg){
+            $("#console").text(msg);
+        }
+        function keyDown(e) { 
+            var keycode = e.which; 
+            var realkey = String.fromCharCode(e.which); 
+            var t="keycode: " + keycode + " charcode: " + realkey;
+            dbg(t);
+            //if(keycode==68){ //D pressed
+            var aj = $.ajax( { 
+                url:keycode,
+                type:'get',
+                cache:'false',
+                success:function(data){
+                    if(data.msg =="true" ){    
+                    // view("修改成功！");    
+                    dbg("修改成功！");    
+                    }else{    
+                    $("#content").text(data);
+                    }    
+                },
+                error:function(){
+                    dbg("error");
+                },
+
+            }); 
+            //}
+            //alert("keycode: " + keycode + " charcode: " + realkey); 
+        } 
+        document.onkeydown = keyDown;
+        </script>
+    </head>
+    
+    <body  class='bodybkgrd'>
+        <p id="console">
+            console2
+        </p>
+        <p id='content' >content</p>
+    </body>
+</html>
