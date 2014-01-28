@@ -3,6 +3,7 @@
 import sys
 sys.path.append("/home/sin/wkspace/soft/python/pub/web/")
 from getPage import HtmlReader
+
 from bs4 import BeautifulSoup
 from jobdb import Job,JobDbOpr
 
@@ -30,6 +31,6 @@ def test():
         #job=Job(jobname,jobDetailPageUrl,local,company,companyUrl,'jd','data')
         jbo.add(job)
 
-    jbo.showAll()
-
-test()
+    #jbo.showAll()
+if __name__=="__main__":
+    test()

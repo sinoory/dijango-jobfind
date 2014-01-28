@@ -2,6 +2,7 @@
 
 from django.conf import settings
 from django.utils import simplejson
+"""
 settings.configure( DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
@@ -13,7 +14,7 @@ settings.configure( DATABASES = {
     }
 }
 )
-
+"""
 
 import sys
 sys.path.append("/home/sin/wkspace/webserver/django/mysite/")

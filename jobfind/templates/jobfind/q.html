@@ -1,0 +1,78 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+  
+  <meta content="text/html; charset=UTF-8" http-equiv="content-type">
+
+  
+  <script type="text/javascript" src="../../../static/js/jquery-1.10.1.js"></script>
+  
+  <script language="javascript">
+        function dbg(msg){
+            $("#console").text(msg);
+        }
+        function querry(){
+            var postdata={
+                searchkey:$("#idsearchkey").val(),
+                workarea:$("#idworkarea").val(),
+                publishday:$("#idpublishday").val(),
+            }
+            dbg("loading...")
+             var aj = $.ajax( { 
+                type:'post',
+                cache:'false',
+                data:postdata,
+                success:function(data){
+		            data = JSON.parse(data);
+                    dbg("post res="+data.code)
+                    //$("#coname").text(job.coname);
+                },
+                error:function(){
+                    dbg("error");
+                },
+
+            }); 
+       }
+        
+        $(document).ready(function(){
+            startId={{start_id}}; //template variables
+            totalRcd={{total_rcd}};
+        });
+        function test(){
+            //dbg(unescape("{\u82e5\u9690\u82e5\u73b0}"))
+            //dbg(unescape("\u5408\u80a5\u4e2d\u7ee7\u4fe1\u606f\u79d1\u6280\u6709\u9650\u516c\u53f8"))
+            //dbg(unescape("Android\u8f6f\u4ef6\u5f00\u53d1\u5de5\u7a0b\u5e08"))
+        }
+        </script>
+  <title>querry</title>
+
+  
+</head><body class="bodybkgrd">
+<br>
+
+工作地点
+<select id="idworkarea">
+
+<option value="020000">上海</option>
+<option value="030000">深圳</option>
+</select>
+
+<br>
+
+发布日期
+<select id="idpublishday">
+
+<option value="1">近一天</option>
+<option value="2">近两天</option>
+<option value="3">近三天</option>
+</select>
+
+<br>
+
+关键词<textarea cols="20" rows="1" id="idsearchkey"></textarea><br>
+
+<button onclick="querry()">查询</button>
+<br>
+
+<br>
+<p id='console'></p>
+</body></html>
