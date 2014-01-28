@@ -10,8 +10,12 @@ from uty import models2json
 
 def index(request):
     template = loader.get_template('jobfind/b.html')
+    total=Job.objects.count()
+    start=Job.objects.all()[0].id
+    print("index start=%d total=%d" %(start,total))
     context = Context({
-            'latest_poll_list': 'a',
+            'start_id': start,
+            'total_rcd':total,
                 })
     return HttpResponse(template.render(context))
 

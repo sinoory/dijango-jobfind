@@ -3,6 +3,10 @@
         <script type="text/javascript" src="../../../static/js/jquery-1.10.1.js"></script>
         </script>
         <script language="javascript">
+        var startId=0;
+        var totalRcd=0;
+        var current=0;
+        var endId=0
         function dbg(msg){
             $("#console").text(msg);
         }
@@ -10,10 +14,21 @@
             var keycode = e.which; 
             var realkey = String.fromCharCode(e.which); 
             var t="hh keycode: " + keycode + " charcode: " + realkey;
-            dbg(t);
-            //if(keycode==68){ //D pressed
-            var aj = $.ajax( { 
-                url:keycode,
+            //dbg(t);
+            if(keycode==37){ //prev
+                $("#idcur").text(startId+":"+current+":"+endId);
+                showRcd(current);
+                current-=1;
+            }else if(keycode==39){//next
+                $("#idcur").text(startId+":"+current+":"+endId);
+                showRcd(current);
+                current+=1;
+            }
+            //alert("keycode: " + keycode + " charcode: " + realkey); 
+        } 
+        function showRcd(id){
+             var aj = $.ajax( { 
+                url:id,
                 type:'get',
                 cache:'false',
                 success:function(data){
@@ -21,7 +36,7 @@
                     // view("修改成功！");    
                     dbg("修改成功！");    
                     }else{    
-                    $("#content").text(unescape(data));
+                    //$("#content").text(unescape(data));
                     //convert string to json object,and eval also change unicaode(\ue342 ...) to utf8
                     job=eval ("(" + data + ")"); 
                     $("#coname").text(job.coname);
@@ -33,10 +48,16 @@
                 },
 
             }); 
-            //}
-            //alert("keycode: " + keycode + " charcode: " + realkey); 
-        } 
+       }
         document.onkeydown = keyDown;
+        
+        $(document).ready(function(){
+            startId={{start_id}}; //template variables
+            totalRcd={{total_rcd}};
+            current=startId;
+            endId=startId+totalRcd;
+            $("#idcur").text(startId+":"+current+":"+endId);
+        });
         function test(){
             //dbg(unescape("{\u82e5\u9690\u82e5\u73b0}"))
             //dbg(unescape("\u5408\u80a5\u4e2d\u7ee7\u4fe1\u606f\u79d1\u6280\u6709\u9650\u516c\u53f8"))
@@ -46,14 +67,13 @@
     </head>
     
     <body  class='bodybkgrd'>
-        <p id="console">
-            console2
-        </p>
-        <p id='content' >content</p>
+        <p id='idcur'></p>
+        <!--
         <button onclick='test()'>test2</button>
-        <p>Company</p>
+        -->
         <p id='coname'></p>
-        <p>Job</p>
         <p id='job'></p>
+        <p id="console"></p>
+        <p id='content' ></p>
     </body>
 </html>
