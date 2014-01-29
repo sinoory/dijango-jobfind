@@ -10,9 +10,9 @@ from jobdb import Job,JobDbOpr
 
 
 
-def test():
+def test(keyword,jobarea,issuedate):
     jbo = JobDbOpr()
-    reader=HtmlReader("http://search.51job.com/jobsearch/search_result.php?fromJs=1&jobarea=000000%2C00&district=000000&funtype=0000&industrytype=00&issuedate=9&providesalary=99&keyword=android&keywordtype=2&curr_page=2&lang=c&stype=2&postchannel=0000&workyear=99&cotype=99&degreefrom=99&jobterm=01&lonlat=0%2C0&radius=-1&ord_field=0&list_type=0&fromType=14")
+    reader=HtmlReader("http://search.51job.com/jobsearch/search_result.php?fromJs=1&jobarea="+jobarea+"&district=000000&funtype=0000&industrytype=00&issuedate="+issuedate+"&providesalary=99&keyword="+keyword+"&keywordtype=2&curr_page=2&lang=c&stype=2&postchannel=0000&workyear=99&cotype=99&degreefrom=99&jobterm=01&lonlat=0%2C0&radius=-1&ord_field=0&list_type=0&fromType=14")
     reader.run()
     soup=BeautifulSoup(reader.outdata)
     #print soup.findAll("ul",{"class":"dict-basic-ul"})[0].li.strong.string 
@@ -27,7 +27,13 @@ def test():
         company=cols[2].get_text() #.encode('utf-8')
         companyUrl=cols[2].findAll("a",{"class":"coname"})[0].get('href')
         local=cols[3].get_text() #.encode('utf-8')
-        job=Job(job=jobname,jobu=jobDetailPageUrl,local=local,coname=company,courl=companyUrl,jd='jd',update='data')
+        #get jd
+        r=HtmlReader(jobDetailPageUrl)
+        r.run()
+        s=BeautifulSoup(r.outdata)
+        jd=s.findAll("td",{"class":"txt_4 wordBreakNormal job_detail"})[0].get_text()
+        print jd
+        job=Job(job=jobname,jobu=jobDetailPageUrl,local=local,coname=company,courl=companyUrl,jd=jd,update='data')
         #job=Job(jobname,jobDetailPageUrl,local,company,companyUrl,'jd','data')
         jbo.add(job)
 

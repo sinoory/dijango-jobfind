@@ -2,12 +2,12 @@ from django.db import models
 
 class AJob(models.Model):
     site=models.CharField(max_length=20)
-    job=models.CharField(max_length=50)
+    job=models.CharField(max_length=100)
     jobu=models.CharField(max_length=100)
     local=models.CharField(max_length=20)
     coname=models.CharField(max_length=100)
     courl=models.CharField(max_length=100)
-    jd=models.CharField(max_length=500)
+    jd=models.TextField()
     state=models.CharField(max_length=10) #null .get , filter ...
     update=models.CharField(max_length=10)
     sendate=models.CharField(max_length=10)

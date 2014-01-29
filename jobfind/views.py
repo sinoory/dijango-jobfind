@@ -54,14 +54,16 @@ def querry(request):
         return HttpResponse(template.render(context))
     else: #ajax
         form = QuerryForm(request.POST)
-        searchkey=request.POST.get('searchkey')
-        print "post data=%s" %request.POST
+        keyword=request.POST.get('searchkey')
+        jobarea=request.POST.get('workarea')
+        issuedate=request.POST.get('publishday') 
+        print "keyword=%s post data=%s" %(keyword,request.POST)
         if form.is_valid():
             searchkey=request.POST.get('searchkey')
             print "searchkey=%s" %searchkey
             return HttpResponse(json.dumps({"code":1}))
         try:
-            test()
+            test(keyword,jobarea,issuedate)
         except Exception,ex: 
             print Exception,':',ex
             print traceback.print_exc()
