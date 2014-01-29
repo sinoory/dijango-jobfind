@@ -15,7 +15,6 @@ settings.configure( DATABASES = {
 }
 )
 """
-
 import sys
 sys.path.append("/home/sin/wkspace/webserver/django/mysite/")
 sys.path.append("/home/sin/wkspace/soft/python/pub/utility/")

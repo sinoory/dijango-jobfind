@@ -8,7 +8,7 @@ import sys,traceback
 sys.path.append("/home/sin/wkspace/soft/python/pub/utility/")
 from uty import models2json
 sys.path.append("/home/sin/wkspace/webserver/django/mysite/sh")
-from m import test
+from m import addJob
 
 from django import forms
 from django.utils import simplejson as json
@@ -45,6 +45,7 @@ class QuerryForm(forms.Form):
     publishday = forms.IntegerField()
 
 def querry(request):
+    print "querry in..."
     if not request.is_ajax(): 
         template = loader.get_template('jobfind/q.html')
         context = Context({
@@ -54,16 +55,16 @@ def querry(request):
         return HttpResponse(template.render(context))
     else: #ajax
         form = QuerryForm(request.POST)
+        print "post data=%s" %(request.POST)
         keyword=request.POST.get('searchkey')
         jobarea=request.POST.get('workarea')
         issuedate=request.POST.get('publishday') 
-        print "keyword=%s post data=%s" %(keyword,request.POST)
         if form.is_valid():
             searchkey=request.POST.get('searchkey')
             print "searchkey=%s" %searchkey
             return HttpResponse(json.dumps({"code":1}))
         try:
-            test(keyword,jobarea,issuedate)
+            addJob(keyword,jobarea,issuedate,1,1)
         except Exception,ex: 
             print Exception,':',ex
             print traceback.print_exc()
