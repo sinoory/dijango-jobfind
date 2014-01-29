@@ -19,13 +19,15 @@ settings.configure( DATABASES = {
 import sys
 sys.path.append("/home/sin/wkspace/webserver/django/mysite/")
 sys.path.append("/home/sin/wkspace/soft/python/pub/utility/")
-from jobfind.models import Job
+from jobfind.models import Job,JobL
 from uty import models2json
 
 class JobDbOpr():
     def isJobExist(self,job):
+        #querry whether the job exist in the local db jobl
         j=Job.objects.filter(jobu=job.jobu)
-        return len(j)>0
+        jl=JobL.objects.filter(jobu=job.jobu)
+        return len(j)>0 or len(jl)>0
     def add(self,job):
         if self.isJobExist(job):
             print ("Exist %s, ignore" %(job))

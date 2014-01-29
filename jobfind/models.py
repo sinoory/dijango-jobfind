@@ -1,7 +1,6 @@
 from django.db import models
 
-# Create your models here.
-class Job(models.Model):
+class AJob(models.Model):
     site=models.CharField(max_length=20)
     job=models.CharField(max_length=50)
     jobu=models.CharField(max_length=100)
@@ -13,8 +12,14 @@ class Job(models.Model):
     update=models.CharField(max_length=10)
     sendate=models.CharField(max_length=10)
     sendcnt=models.IntegerField(default=0)
+    user=models.CharField(max_length=20)
+    
+    #Lesson Model inherit : define abstract base class
+    class Meta:
+        abstract = True
+# Create your models here.
+class Job(AJob):
 
-        
     """
     def __init__(self,job,jburl,local,comp,compurl,jobdescribe,updata):
         self.job=job
@@ -32,4 +37,6 @@ class Job(models.Model):
         return "Job<%s,%s>" %(self.job,self.coname)
 
 
-
+class JobL(AJob):
+    'the local job db which processed already'
+    pass

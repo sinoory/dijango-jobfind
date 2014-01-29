@@ -1,0 +1,7 @@
+You just installed Django's auth system, which means you don't have any superusers defined.
+Would you like to create one now? (yes/no): yes
+Username (leave blank to use 'sin'): 
+Email address: sinoory@126.com
+Password:1qazxsw2
+Password (again): 
+

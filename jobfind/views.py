@@ -4,7 +4,7 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from django.template import Context, loader
 from jobfind.models import Job
-import sys
+import sys,traceback
 sys.path.append("/home/sin/wkspace/soft/python/pub/utility/")
 from uty import models2json
 sys.path.append("/home/sin/wkspace/webserver/django/mysite/sh")
@@ -16,7 +16,10 @@ from django.utils import simplejson as json
 def index(request):
     template = loader.get_template('jobfind/b.html')
     total=Job.objects.count()
-    start=Job.objects.all()[0].id
+    if total>0:
+        start=Job.objects.all()[0].id
+    else:
+        start=0
     print("index start=%d total=%d" %(start,total))
     context = Context({
             'start_id': start,
@@ -25,12 +28,16 @@ def index(request):
     return HttpResponse(template.render(context))
 
 def detail(request, poll_id):
-    j=Job.objects.get(id=int(poll_id))
-    #print "detail(%s)" %(poll_id)
-    if j!=None: 
-        res= "%s" %models2json(j)
-        
-    return HttpResponse("%s" %res)
+    try:
+        j=Job.objects.get(id=int(poll_id))
+        #print "detail(%s)" %(poll_id)
+        if j!=None: 
+            res= "%s" %models2json(j)
+        return HttpResponse("%s" %res)
+    except Exception,ex: 
+        print Exception,':',ex
+        print traceback.print_exc()
+   
 
 class QuerryForm(forms.Form):
     searchkey = forms.CharField(required=True)
@@ -40,11 +47,9 @@ class QuerryForm(forms.Form):
 def querry(request):
     if not request.is_ajax(): 
         template = loader.get_template('jobfind/q.html')
-        total=Job.objects.count()
-        start=Job.objects.all()[0].id
         context = Context({
-                'start_id': start,
-                'total_rcd':total,
+                'start_id': 0,
+                'total_rcd':0,
                     })
         return HttpResponse(template.render(context))
     else: #ajax
@@ -55,7 +60,11 @@ def querry(request):
             searchkey=request.POST.get('searchkey')
             print "searchkey=%s" %searchkey
             return HttpResponse(json.dumps({"code":1}))
-        test()
+        try:
+            test()
+        except Exception,ex: 
+            print Exception,':',ex
+            print traceback.print_exc()
         return HttpResponse(json.dumps({"code":0}))
         
 
