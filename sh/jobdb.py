@@ -2,24 +2,30 @@
 
 from django.conf import settings
 from django.utils import simplejson
-"""
-settings.configure( DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'db_tst_dj',
-        'USER': 'root',
-        'PASSWORD': 'r',
-        'HOST': '',
-        'CHARSET':'utf-8',
-    }
-}
-)
-"""
-import sys
+import sys,os
 sys.path.append("/home/sin/wkspace/webserver/django/mysite/")
 sys.path.append("/home/sin/wkspace/soft/python/pub/utility/")
+if __name__ == "__main__" :
+    settings.configure( DATABASES = { #Lession : use ORM seprately,must config before import model
+        'default': {
+            'ENGINE': 'django.db.backends.mysql',
+            'NAME': 'db_tst_dj',
+            'USER': 'root',
+            'PASSWORD': 'r',
+            'HOST': '',
+            'CHARSET':'utf-8',
+        }
+    }
+    )
+
+
 from jobfind.models import Job,JobL
-from uty import models2json
+from uty import models2json,testobj2dict
+
+
+def mergeTable():
+    cmd="""mysql -uroot --password=r -D db_tst_dj -e "insert into jobfind_jobl select * from jobfind_job" """
+    os.system(cmd)
 
 class JobDbOpr():
     def isJobExist(self,job):
@@ -40,7 +46,6 @@ class JobDbOpr():
 
     def initjob(self,job,jburl,local,comp,compurl,jobdescribe,updata):
         j=Job()
-        j.id=5
         j.job=job
         j.jobu=jburl
         j.local=local
@@ -52,17 +57,19 @@ class JobDbOpr():
 
 
 if __name__ == "__main__" :
+
+    #configSetting()
     jobopr=JobDbOpr()
     #Add
     ed_user = jobopr.initjob('Android', 'http:job','sh', 'HTC','http:htc','write apk','20140101')
     jobopr.add(ed_user)
     jobopr.add(ed_user)
-    ed_user = jobopr.initjob('按着', 'http:job2','sh', '一零科技','http:htc','write apk','20140101')
+    #ed_user = jobopr.initjob('按着', 'http:job2','sh', '一零科技','http:htc','write apk','20140101')
     #jobopr.add(ed_user)
     #jobopr.add(ed_user)
     
-    print models2json(ed_user).encode('utf-8')
-
+    #print models2json(ed_user)
+    print testobj2dict(ed_user)
 
 
 

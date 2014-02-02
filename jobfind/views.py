@@ -1,14 +1,16 @@
 from django.shortcuts import render
-
+import os
 # Create your views here.
 from django.http import HttpResponse
 from django.template import Context, loader
+from django.http import HttpResponseRedirect
 from jobfind.models import Job
 import sys,traceback
 sys.path.append("/home/sin/wkspace/soft/python/pub/utility/")
 from uty import models2json
 sys.path.append("/home/sin/wkspace/webserver/django/mysite/sh")
 from m import addJob
+from jobdb import mergeTable
 
 from django import forms
 from django.utils import simplejson as json
@@ -90,3 +92,12 @@ def querry(request):
         return HttpResponse(json.dumps({"code":1}))
         
 
+def submitstatus(request):
+    try:
+        mergeTable() 
+        return HttpResponseRedirect("index")
+    except Exception,ex:
+        print Exception,':',ex
+        print traceback.print_exc()
+    #if request.is_ajax():
+        

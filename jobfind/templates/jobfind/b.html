@@ -28,10 +28,12 @@
                 current+=1;
             }else {
                 newstatus=""
-                if(keycode==68){//D:delete
+                if(keycode==78){//N:null
                     newstatus="null"
                 }else if(keycode==71){//G:get
                     newstatus="get"
+                }else if(keycode==87){//W:
+                    newstatus="watch"
                 }
                 if(newstatus.length>0)
                     modifyStatus(preCurr,newstatus)
@@ -102,11 +104,34 @@
             //dbg(unescape("\u5408\u80a5\u4e2d\u7ee7\u4fe1\u606f\u79d1\u6280\u6709\u9650\u516c\u53f8"))
             //dbg(unescape("Android\u8f6f\u4ef6\u5f00\u53d1\u5de5\u7a0b\u5e08"))
         }
+        function submitres(){
+            var check=confirm("submit data status to local db?")
+            if(check){
+              var aj = $.ajax( { 
+                url:"submitstatus",
+                type:'post',
+                cache:'false',
+                success:function(data){
+                },
+                error:function(){
+                    dbg("error");
+                },
+
+            }); 
+               
+            }
+        }
         </script>
+        
     </head>
     
     <body  class='bodybkgrd'>
-        <p id='idcur'></p>
+        <table>
+            <tr>
+                <td><p id='idcur'></p></td>
+                <td><input type='button' value='submit' onclick='submitres()'></input></td>
+            </tr>
+        </table>
         <!--
         <button onclick='test()'>test2</button>
         -->
