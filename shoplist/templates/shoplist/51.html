@@ -1,0 +1,149 @@
+<html>
+    <head>
+        <script type="text/javascript" src="../../../static/js/jquery-1.10.1.js"></script>
+        </script>
+        <script language="javascript">
+        var startId=0;
+        var totalRcd=0;
+        var current=0;
+        var preCurr=0;
+        var endId=0
+        function dbg(msg){
+            $("#console").text(msg);
+        }
+        function keyDown(e) { 
+            var keycode = e.which; 
+            var realkey = String.fromCharCode(e.which); 
+            var t="keycode: " + keycode + " charcode: " + realkey;
+            dbg(t);
+            if(keycode==37){ //prev
+                $("#idcur").text(startId+":"+current+":"+endId);
+                showRcd(current);
+                preCurr=current
+                current-=1;
+            }else if(keycode==39){//next
+                $("#idcur").text(startId+":"+current+":"+endId);
+                showRcd(current);
+                preCurr=current
+                current+=1;
+            }else {
+                newstatus=""
+                if(keycode==78){//N:null
+                    newstatus="null"
+                }else if(keycode==71){//G:get
+                    newstatus="get"
+                }else if(keycode==87){//W:
+                    newstatus="watch"
+                }
+                if(newstatus.length>0)
+                    modifyStatus(preCurr,newstatus)
+            }
+
+            //alert("keycode: " + keycode + " charcode: " + realkey); 
+        } 
+        function showRcd(id){
+             var aj = $.ajax( { 
+                url:id,
+                type:'get',
+                cache:'false',
+                success:function(data){
+                    if(data.msg =="true" ){    
+                    // view("修改成功！");    
+                    dbg("修改成功！");    
+                    }else{    
+                    //$("#content").text(unescape(data));
+                    //convert string to json object,and eval also change unicaode(\ue342 ...) to utf8
+                    job=eval ("(" + data + ")"); 
+                    $("#coname").html("<a href='"+job.courl+"' target='_blank' >"+job.coname+"<a/>");
+                    $("#codesc").text(job.cd.replace(/\n/g,"    "));
+                    $("#job").html("<a href='"+job.jobu+"' target='_blank' >"+job.job+"<a/>");
+                    $("#jobdesc").html(job.jd.replace(/\n/g,"<br/>"));//use html() to show tags
+                    $("#jstate").text(job.state)
+                    //testrn(job.jd)
+                    } 
+                },
+                error:function(){
+                    dbg("error");
+                },
+
+            }); 
+       }
+        document.onkeydown = keyDown;
+         function modifyStatus(id,newstatus){
+            postdata={
+                status:newstatus,
+            }
+             var aj = $.ajax( { 
+                url:"modify/"+preCurr+"/",
+                type:'post',
+                cache:'false',
+                data:postdata,
+                success:function(data){
+                    dbg("ok,data="+data) 
+                    $("#jstate").text(newstatus)
+                },
+                error:function(){
+                    dbg("error");
+                },
+
+            }); 
+       }
+      function testrn(str){
+            alert(str)
+       }
+        $(document).ready(function(){
+            startId={{start_id}}; //template variables
+            totalRcd={{total_rcd}};
+            current=startId;
+            preCurr=current
+            endId=startId+totalRcd;
+            $("#idcur").text(startId+":"+current+":"+endId);
+        });
+        function test(){
+            //dbg(unescape("{\u82e5\u9690\u82e5\u73b0}"))
+            //dbg(unescape("\u5408\u80a5\u4e2d\u7ee7\u4fe1\u606f\u79d1\u6280\u6709\u9650\u516c\u53f8"))
+            //dbg(unescape("Android\u8f6f\u4ef6\u5f00\u53d1\u5de5\u7a0b\u5e08"))
+        }
+        function submitres(){
+            var check=confirm("submit data status to local db?")
+            if(check){
+              var aj = $.ajax( { 
+                url:"submitstatus",
+                type:'post',
+                cache:'false',
+                success:function(data){
+                },
+                error:function(){
+                    dbg("error");
+                },
+
+            }); 
+               
+            }
+        }
+        </script>
+        
+    </head>
+    
+    <body  class='bodybkgrd'>
+        <table>
+            <tr>
+                <td><p id='idcur'></p></td>
+                <td><input type='button' value='submit' onclick='submitres()'></input></td>
+            </tr>
+        </table>
+        <!--
+        <button onclick='test()'>test2</button>
+        -->
+        <p id='coname'></p>
+        <p id='codesc'></p>
+        <table><tr><td id='jstate'><td id='job'></td></td></tr></table>
+        <!--
+        <p id='job'></p>
+        <p id='jstate'></p>
+        -->
+        <p id='jobdesc'></p>
+        <p id="console"></p>
+        <p id='content' ></p>
+    </body>
+</html>
