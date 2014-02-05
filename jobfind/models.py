@@ -15,6 +15,16 @@ class AJob(models.Model):
     sendcnt=models.IntegerField(default=0)
     user=models.CharField(max_length=20)
     
+    def __unicode__(self):
+        #return "Job<%s,%s>" %(self.job.decode('utf-8'),self.coname.decode('utf-8'))
+        #return "Job<%s,%s>" %(self.job.encode('utf-8'),self.coname.encode('utf-8'))
+        return "Job<%s,%s>" %(self.job,self.coname)
+
+"""
+    **def __unicode__(self):**
+            **return u'%s %s' % (self.first_name, self.last_name)**
+"""
+
     #Lesson Model inherit : define abstract base class
     class Meta:
         abstract = True
@@ -32,12 +42,9 @@ class Job(AJob):
         self.updata=updata
         self.state="null"
     """
-    def __unicode__(self):
-        #return "Job<%s,%s>" %(self.job.decode('utf-8'),self.coname.decode('utf-8'))
-        #return "Job<%s,%s>" %(self.job.encode('utf-8'),self.coname.encode('utf-8'))
-        return "Job<%s,%s>" %(self.job,self.coname)
 
 
 class JobL(AJob):
     'the local job db which processed already'
     pass
+
