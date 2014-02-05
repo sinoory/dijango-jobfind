@@ -20,10 +20,10 @@ class AJob(models.Model):
         #return "Job<%s,%s>" %(self.job.encode('utf-8'),self.coname.encode('utf-8'))
         return "Job<%s,%s>" %(self.job,self.coname)
 
-"""
+    """
     **def __unicode__(self):**
             **return u'%s %s' % (self.first_name, self.last_name)**
-"""
+    """
 
     #Lesson Model inherit : define abstract base class
     class Meta:

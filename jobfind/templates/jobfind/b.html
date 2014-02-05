@@ -1,6 +1,7 @@
 <html>
     <head>
         <script type="text/javascript" src="../../../static/js/jquery-1.10.1.js"></script>
+        <script type="text/javascript" src="../../../static/js/jscolor/jscolor.js"></script>
         </script>
         <script language="javascript">
         var startId=0;
@@ -132,6 +133,8 @@
                 <td><input type='button' value='submit' onclick='submitres()'></input></td>
             </tr>
         </table>
+        <!-- http://jscolor.com/try.php#onchange  -->
+        <input id='idcolorpicker' class='color'  onchange="$('body').css('background-color','#'+this.color)">
         <!--
         <button onclick='test()'>test2</button>
         -->
