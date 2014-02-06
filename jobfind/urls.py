@@ -8,4 +8,5 @@ urlpatterns = patterns('',
     url(r'^(?P<poll_id>\d+)/$', views.detail, name='detail'),
     url(r'^modify/(?P<rcdid>\d+)/$', views.modify),
     url(r'^submitstatus$', views.submitstatus),
+    url(r'^viewljobs$', views.viewljobs),#view local jobs whith get or water status
     )

@@ -4,7 +4,7 @@ import os
 from django.http import HttpResponse
 from django.template import Context, loader
 from django.http import HttpResponseRedirect
-from jobfind.models import Job
+from jobfind.models import Job,JobL
 import sys,traceback
 sys.path.append("/home/sin/wkspace/soft/python/pub/utility/")
 from uty import models2json
@@ -85,7 +85,7 @@ def querry(request):
             print "searchkey=%s" %searchkey
             return HttpResponse(json.dumps({"code":0}))
         try:
-            addJob(keyword,jobarea,issuedate,1,1)
+            addJob(keyword,jobarea,issuedate,1,50)
         except Exception,ex: 
             print Exception,':',ex
             print traceback.print_exc()
@@ -101,3 +101,11 @@ def submitstatus(request):
         print traceback.print_exc()
     #if request.is_ajax():
         
+def viewljobs(request):
+    template = loader.get_template('jobfind/viewljobs.html')
+    jobs=JobL.objects.filter(state='watch')
+    context = Context({
+            'joblist': jobs,
+                })
+    return HttpResponse(template.render(context))
+   
