@@ -20,11 +20,18 @@ if __name__ == "__main__" :
 
 
 from jobfind.models import Job,JobL
-from uty import models2json,testobj2dict
+from uty import models2json,testobj2dict,modelKeys
 
 
 def mergeTable():
-    cmd="""mysql -uroot --password=r -D db_tst_dj -e "insert into jobfind_jobl select * from jobfind_job" """
+    j=Job()
+    keys=modelKeys(j)
+    keys.remove('id') #avoid insert error of duplicate primary key
+    sqlkeys= "%s" %(",".join(keys))
+    cmd="""mysql -uroot --password=r -D db_tst_dj -e "insert into jobfind_jobl("""+sqlkeys+""") select """+sqlkeys+"""  from jobfind_job" """
+    print cmd
+    os.system(cmd)
+    cmd=""" mysql -uroot --password=r -D db_tst_dj -e " delete from jobfind_job " """
     os.system(cmd)
 
 class JobDbOpr():
@@ -56,8 +63,12 @@ class JobDbOpr():
         return j
 
 
-if __name__ == "__main__" :
+def tstm():
+    j=Job()
+    print modelKeys(j)
 
+
+def testJobDb():
     #configSetting()
     jobopr=JobDbOpr()
     #Add
@@ -72,7 +83,8 @@ if __name__ == "__main__" :
     print testobj2dict(ed_user)
 
 
-
+if __name__ == "__main__" :
+    tstm()
 
 
 

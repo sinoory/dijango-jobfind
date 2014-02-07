@@ -10,7 +10,7 @@ class AJob(models.Model):
     jd=models.TextField()
     cd=models.CharField(max_length=100) #company simple describle
     state=models.CharField(max_length=10) #null .get , filter ...
-    update=models.CharField(max_length=10)
+    udate=models.CharField(max_length=10)
     sendate=models.CharField(max_length=10)
     sendcnt=models.IntegerField(default=0)
     user=models.CharField(max_length=20)

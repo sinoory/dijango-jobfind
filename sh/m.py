@@ -23,7 +23,7 @@ def addOnePageJob(keyword,jobarea,issuedate,pageindex):
     soup=BeautifulSoup(reader.outdata)
     #print soup.findAll("ul",{"class":"dict-basic-ul"})[0].li.strong.string 
     #find the table firest ,then find the job items
-    #a itme looks like : checkbox jobname companyname locate updatedata
+    #a itme looks like : checkbox jobname companyname locate udatedata
     olTag=soup.findAll("table",{"class":"resultList resultListWide"})[0].findAll("tr",{"class":"tr0"})
     for j in olTag :
         cols=j.findAll("td")
@@ -37,7 +37,7 @@ def addOnePageJob(keyword,jobarea,issuedate,pageindex):
         jd,cd=getDescript(jobDetailPageUrl)
         if(len(jd)<5):
             continue
-        job=Job(job=jobname,jobu=jobDetailPageUrl,local=local,coname=company,courl=companyUrl,jd=jd,cd=cd,update=ud)
+        job=Job(job=jobname,jobu=jobDetailPageUrl,local=local,coname=company,courl=companyUrl,jd=jd,cd=cd,udate=ud)
         jbo.add(job)
 
     #jbo.showAll()
