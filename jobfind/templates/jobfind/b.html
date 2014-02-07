@@ -18,12 +18,12 @@
             var t="keycode: " + keycode + " charcode: " + realkey;
             dbg(t);
             if(keycode==37){ //prev
-                $("#idcur").text(startId+":"+current+":"+endId);
+                $("#idcur").text(current);
                 showRcd(current);
                 preCurr=current
                 current-=1;
             }else if(keycode==39){//next
-                $("#idcur").text(startId+":"+current+":"+endId);
+                $("#idcur").text(current);
                 showRcd(current);
                 preCurr=current
                 current+=1;
@@ -98,7 +98,10 @@
             current=startId;
             preCurr=current
             endId=startId+totalRcd;
-            $("#idcur").text(startId+":"+current+":"+endId);
+            $("#idcur").text(current);
+            $("#idstart").text(startId+":")
+            $("#idend").text(":"+endId)
+            $("#idtextareacur").hide()
         });
         function test(){
             //dbg(unescape("{\u82e5\u9690\u82e5\u73b0}"))
@@ -122,6 +125,21 @@
                
             }
         }
+
+        function showInput(){
+            var t=$("#idcur").text()
+            $("#idcur").hide()
+            $("#idtextareacur").val(t)
+            $("#idtextareacur").show()
+        }
+        function showCur(){
+            var t=$("#idtextareacur").val()
+            $("#idcur").show()
+            $("#idtextareacur").hide()
+            $("#idcur").text(t)
+            current=Number(t)
+            showRcd(current);
+        }
         </script>
         
     </head>
@@ -129,7 +147,7 @@
     <body  class='bodybkgrd'>
         <table>
             <tr>
-                <td><p id='idcur'></p></td>
+                <td><span id='idstart'></span><input id='idtextareacur' value='99' type='text' onchange='showCur()' ><span id='idcur' onclick='showInput()'></span><span id='idend'></span></td>
                 <td><input type='button' value='submit' onclick='submitres()'></input></td>
             </tr>
         </table>

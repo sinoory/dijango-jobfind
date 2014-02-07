@@ -5,6 +5,11 @@ sys.path.append("/home/sin/wkspace/soft/python/pub/web/")
 from getPage import HtmlReader
 
 from bs4 import BeautifulSoup
+from jobdb import ormsettingconfig
+
+if __name__=='__main__':
+    ormsettingconfig()
+
 from jobdb import Job,JobDbOpr
 import re
 
@@ -12,7 +17,10 @@ import re
 def addJob(keyword,jobarea,issuedate,startpage=1,endpage=50):
     loop=startpage
     while(loop<=endpage):
-        addOnePageJob(keyword,jobarea,issuedate,loop)
+        jobs,url=addOnePageJob(keyword,jobarea,issuedate,loop)
+        if jobs==0 :
+            print "Exit,No job in page "+url
+            break;            
         loop+=1;
 
 def addOnePageJob(keyword,jobarea,issuedate,pageindex):
@@ -25,6 +33,7 @@ def addOnePageJob(keyword,jobarea,issuedate,pageindex):
     #find the table firest ,then find the job items
     #a itme looks like : checkbox jobname companyname locate udatedata
     olTag=soup.findAll("table",{"class":"resultList resultListWide"})[0].findAll("tr",{"class":"tr0"})
+    cnt=0
     for j in olTag :
         cols=j.findAll("td")
         jobDetailPageUrl=cols[1].findAll("a",{"class":"jobname"})[0].get('href')
@@ -39,7 +48,8 @@ def addOnePageJob(keyword,jobarea,issuedate,pageindex):
             continue
         job=Job(job=jobname,jobu=jobDetailPageUrl,local=local,coname=company,courl=companyUrl,jd=jd,cd=cd,udate=ud)
         jbo.add(job)
-
+        cnt+=1
+    return cnt,pagesearchurl
     #jbo.showAll()
 
 def getDescript(joburl):
@@ -59,6 +69,7 @@ def getDescript(joburl):
         if len(jobstoped)>0:
             print jobstoped[0]
             return "",""
+        print "Exception in getDescript(%s)" %joburl
         raise Exception(ex)
 
     return sjd, scd
@@ -70,6 +81,6 @@ def rmHtmlTag(html):
 
 
 if __name__=="__main__":
-    addJob("linux","020000",'3',1,1)
+    addJob("webkit","020000",'3',3,50)
     #getDescript('http://search.51job.com/job/56889371,c.html')
     #getDescript('http://ac.51job.com/phpAD/adtrace.php?ID=15736875&JobID=56483257')

@@ -5,7 +5,7 @@ from django.utils import simplejson
 import sys,os
 sys.path.append("/home/sin/wkspace/webserver/django/mysite/")
 sys.path.append("/home/sin/wkspace/soft/python/pub/utility/")
-if __name__ == "__main__" :
+def ormsettingconfig():
     settings.configure( DATABASES = { #Lession : use ORM seprately,must config before import model
         'default': {
             'ENGINE': 'django.db.backends.mysql',
@@ -18,6 +18,8 @@ if __name__ == "__main__" :
     }
     )
 
+if __name__ == "__main__" :
+    ormsettingconfig()
 
 from jobfind.models import Job,JobL
 from uty import models2json,testobj2dict,modelKeys
