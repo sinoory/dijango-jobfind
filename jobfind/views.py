@@ -7,7 +7,7 @@ from django.http import HttpResponseRedirect
 from jobfind.models import Job,JobL
 import sys,traceback
 sys.path.append("/home/sin/wkspace/soft/python/pub/utility/")
-from uty import models2json
+from uty import *
 sys.path.append("/home/sin/wkspace/webserver/django/mysite/sh")
 from m import addJob
 from jobdb import mergeTable
@@ -15,12 +15,14 @@ from jobdb import mergeTable
 from django import forms
 from django.utils import simplejson as json
 
+JobDbView=Job #Lesson : varable can point to a class instead of object , like macro in c++
+
 def index(request):
     print "index in..."
     template = loader.get_template('jobfind/b.html')
-    total=Job.objects.count()
+    total=JobDbView.objects.count()
     if total>0:
-        start=Job.objects.all()[0].id
+        start=JobDbView.objects.all()[0].id
     else:
         start=0
     print("index start=%d total=%d" %(start,total))
@@ -34,9 +36,11 @@ def index(request):
 def detail(request, poll_id):
     print "detail in..."
     try:
-        j=Job.objects.get(id=int(poll_id))
+        j=JobDbView.objects.get(id=int(poll_id))
         if j!=None: 
-            res= "%s" %models2json(j)
+            jdict=model2dict(j)
+            jdict['jobsCnt']=JobDbView.objects.count()
+            res= "%s" %dict2json(jdict)
         return HttpResponse("%s" %res)
     except Exception,ex: 
         print Exception,':',ex

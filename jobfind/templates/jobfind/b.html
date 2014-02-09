@@ -52,13 +52,16 @@
                     dbg("修改成功！");    
                     }else{    
                     //$("#content").text(unescape(data));
-                    //convert string to json object,and eval also change unicaode(\ue342 ...) to utf8
+                    //Lesson:json: use eval convert string to json object,and  also change unicaode(\ue342 ...) to utf8
                     job=eval ("(" + data + ")"); 
                     $("#coname").html("<a href='"+job.courl+"' target='_blank' >"+job.coname+"<a/>");
                     $("#codesc").text(job.cd.replace(/\n/g,"    "));
                     $("#job").html("<a href='"+job.jobu+"' target='_blank' >"+job.job+"<a/>");
                     $("#jobdesc").html(job.jd.replace(/\n/g,"<br/>"));//use html() to show tags
                     $("#jstate").text(job.state)
+                    totalRcd=job.jobsCnt
+                    endId=startId+totalRcd;
+                    $("#idend").text(":"+endId)
                     //testrn(job.jd)
                     } 
                 },
