@@ -7,7 +7,6 @@
         var startId=0;
         var totalRcd=0;
         var current=0;
-        var preCurr=0;
         var endId=0
         function dbg(msg){
             $("#console").text(msg);
@@ -18,15 +17,15 @@
             var t="keycode: " + keycode + " charcode: " + realkey;
             dbg(t);
             if(keycode==37){ //prev
-                $("#idcur").text(current);
-                showRcd(current);
-                preCurr=current
                 current-=1;
-            }else if(keycode==39){//next
+                if(current<startId){current=startId}
                 $("#idcur").text(current);
                 showRcd(current);
-                preCurr=current
+            }else if(keycode==39){//next
                 current+=1;
+                if(current>endId){current=endId}
+                $("#idcur").text(current);
+                showRcd(current);
             }else {
                 newstatus=""
                 if(keycode==78){//N:null
@@ -37,7 +36,7 @@
                     newstatus="watch"
                 }
                 if(newstatus.length>0)
-                    modifyStatus(preCurr,newstatus)
+                    modifyStatus(current,newstatus)
             }
 
             //alert("keycode: " + keycode + " charcode: " + realkey); 
@@ -75,7 +74,7 @@
                 status:newstatus,
             }
              var aj = $.ajax( { 
-                url:"modify/"+preCurr+"/",
+                url:"modify/"+current+"/",
                 type:'post',
                 cache:'false',
                 data:postdata,
@@ -96,7 +95,6 @@
             startId={{start_id}}; //template variables
             totalRcd={{total_rcd}};
             current=startId;
-            preCurr=current
             endId=startId+totalRcd;
             $("#idcur").text(current);
             $("#idstart").text(startId+":")

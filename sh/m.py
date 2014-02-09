@@ -76,6 +76,7 @@ def getDescript(joburl):
 
 def rmHtmlTag(html):
     html=html.replace("<br>","\n").replace("</br>","")
+    html=html.replace("<div>","\n").replace("</div>","")
     html=re.sub(r'</?\w+[^>]*>','',html)
     return html
 
