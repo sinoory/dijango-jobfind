@@ -9,14 +9,14 @@ import sys,traceback
 sys.path.append("/home/sin/wkspace/soft/python/pub/utility/")
 from uty import *
 sys.path.append("/home/sin/wkspace/webserver/django/mysite/sh")
-from m import addJob
+from m import Job51Adder
 from jobdb import mergeTable
 
 from django import forms
 from django.utils import simplejson as json
 
 JobDbView=Job #Lesson : varable can point to a class instead of object , like macro in c++
-
+jobAdder=Job51Adder()
 def index(request):
     print "index in..."
     template = loader.get_template('jobfind/b.html')
@@ -82,6 +82,10 @@ def querry(request):
         form = QuerryForm(request.POST)
         print "post data=%s" %(request.POST)
         keyword=request.POST.get('searchkey')
+        if keyword=="STOP":
+            jobAdder.userStopped=True
+            return HttpResponse(json.dumps({"code":"stopped"}))
+
         jobarea=request.POST.get('workarea')
         issuedate=request.POST.get('publishday') 
         if form.is_valid():
@@ -89,11 +93,11 @@ def querry(request):
             print "searchkey=%s" %searchkey
             return HttpResponse(json.dumps({"code":0}))
         try:
-            addJob(keyword,jobarea,issuedate,1,50)
+            jobAdder.addJob(keyword,jobarea,issuedate,1,2)
         except Exception,ex: 
             print Exception,':',ex
             print traceback.print_exc()
-        return HttpResponse(json.dumps({"code":1}))
+        return HttpResponse(json.dumps({"code":"load job finished"}))
         
 
 def submitstatus(request):

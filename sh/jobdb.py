@@ -6,6 +6,8 @@ import sys,os
 sys.path.append("/home/sin/wkspace/webserver/django/mysite/")
 sys.path.append("/home/sin/wkspace/soft/python/pub/utility/")
 def ormsettingconfig():
+    if settings.configured==True: #Lesson: django judge whether setting is configed
+        return
     settings.configure( DATABASES = { #Lession : use ORM seprately,must config before import model
         'default': {
             'ENGINE': 'django.db.backends.mysql',

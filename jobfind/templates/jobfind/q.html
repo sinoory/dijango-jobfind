@@ -10,6 +10,26 @@
         function dbg(msg){
             $("#console").text(msg);
         }
+        function stopquerry(){
+            var postdata={
+                searchkey:"STOP",
+            }
+            dbg("stop...")
+             var aj = $.ajax( { 
+                type:'post',
+                cache:'false',
+                data:postdata,
+                success:function(data){
+		            data = JSON.parse(data);
+                    dbg("post res="+data.code)
+                    //$("#coname").text(job.coname);
+                },
+                error:function(){
+                    dbg("stop error");
+                },
+
+            }); 
+        } 
         function querry(){
             var postdata={
                 searchkey:$("#idsearchkey").val(),
@@ -71,7 +91,10 @@
 关键词<textarea cols="20" rows="1" id="idsearchkey"></textarea><br>
 
 <button onclick="querry()">查询</button>
+<button onclick="stopquerry()">停止</button>
 <br>
+
+<p><a href="/jobfind/index">View getted jobs</a></p>
 
 <br>
 <p id='console'></p>
