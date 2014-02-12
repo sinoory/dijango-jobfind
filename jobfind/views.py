@@ -5,6 +5,7 @@ from django.http import HttpResponse
 from django.template import Context, loader
 from django.http import HttpResponseRedirect
 from jobfind.models import Job,JobL
+from django.db.models import Q
 import sys,traceback
 sys.path.append("/home/sin/wkspace/soft/python/pub/utility/")
 from uty import *
@@ -112,7 +113,8 @@ def submitstatus(request):
         
 def viewljobs(request):
     template = loader.get_template('jobfind/viewljobs.html')
-    jobs=JobL.objects.filter(state='watch')
+    jobs=JobL.objects.filter(Q(state='watch')|Q(state='get')) #Lesson django,orm querry whith OR
+    #jobs=JobL.objects.filter(state='watch')
     context = Context({
             'joblist': jobs,
                 })

@@ -16,6 +16,7 @@
         function dbg(msg){
             $("#console").text(msg);
         }
+        
         function keyDown(e) { 
             var keycode = e.which; 
             var realkey = String.fromCharCode(e.which); 
@@ -75,6 +76,7 @@
                 },
 
             }); 
+            localStorage.lastIndex=id
        }
         document.onkeydown = keyDown;
          function modifyStatus(id,newstatus){
@@ -102,7 +104,14 @@
         $(document).ready(function(){
             startId={{start_id}}; //template variables
             totalRcd={{total_rcd}};
-            current=startId;
+            if(typeof localStorage.lastIndex == "undefined"){ //Lesson js html5:localstorage judge undefined value
+                current=startId
+            }else{
+                current=parseInt(localStorage.lastIndex);
+            }
+            if(typeof localStorage.bkgroundcolor != "undefined"){
+                changeBkColor(localStorage.bkgroundcolor)
+            }
             endId=startId+totalRcd;
             $("#idcur").text(current);
             $("#idstart").text(startId+":")
@@ -122,6 +131,7 @@
                 type:'post',
                 cache:'false',
                 success:function(data){
+                    localStorage.removeItem("lastIndex")
                 },
                 error:function(){
                     dbg("error");
@@ -146,6 +156,10 @@
             current=Number(t)
             showRcd(current);
         }
+        function changeBkColor(color){
+            $('body').css('background-color','#'+color)
+            localStorage.bkgroundcolor=color
+        }
         </script>
         
     </head>
@@ -159,7 +173,7 @@
             </tr>
         </table>
         <!-- http://jscolor.com/try.php#onchange  -->
-        <input id='idcolorpicker' class='color'  onchange="$('body').css('background-color','#'+this.color)">
+        <input id='idcolorpicker' class='color'  onchange="changeBkColor(this.color)">
         <!--
         <button onclick='test()'>test2</button>
         -->
