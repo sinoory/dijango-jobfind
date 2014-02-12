@@ -64,6 +64,11 @@ class Job51Adder():
             if(len(jd)<5):
                 continue
             job=Job(job=jobname,jobu=jobDetailPageUrl,local=local,coname=company,courl=companyUrl,jd=jd,cd=cd,udate=ud)
+            jobstring="%s%s" %(jobname,jd.decode("utf-8")) #TODO why type(jd)=str but type(jobname)=u?
+            if jobstring.upper().find(keyword.upper()) == -1:
+                print "Ignore Job<%s,%s> not contain keyword %s" %(jobname,company,keyword)
+                continue
+
             jbo.add(job)
             cnt+=1
         return cnt,pagesearchurl

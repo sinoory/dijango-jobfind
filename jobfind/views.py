@@ -93,7 +93,8 @@ def querry(request):
             print "searchkey=%s" %searchkey
             return HttpResponse(json.dumps({"code":0}))
         try:
-            jobAdder.addJob(keyword,jobarea,issuedate,1,2)
+            jobAdder.addJob(keyword,jobarea,issuedate,1,50)
+            jobAdder.userStopped=False
         except Exception,ex: 
             print Exception,':',ex
             print traceback.print_exc()
