@@ -3,22 +3,50 @@
         <script type="text/javascript" src="../../../static/js/jquery-1.10.1.js"></script>
         <script type="text/javascript" src="../../../static/js/jscolor/jscolor.js"></script>
         <script language="javascript">
+            function showJobs(){
+                $("#idstatus").val("get")
+                //$("#idtabjobs tr:gt(0)").remove();
+            }
+            var lastStatus=""
+            var lastLocal=""
+            function querryJobs(){
+                status=$("#idstatus").find("option:selected").text()
+                local=$("#idlocal").find("option:selected").text()
+                lastStatus=status
+                lastLocal=local
+                dbg("querryJobs local="+local+",status="+status)
+                postdata={
+                    local:local,
+                    status:status
+                }
+             var aj = $.ajax( { 
+                type:'post',
+                cache:'false',
+                data:postdata,
+                success:function(data){
+                   $("#idivtable").html(data)
+                   $("#idstatus").val(lastStatus)
+                   $("#idlocal").val(lastLocal)
+                },
+                error:function(){
+                    dbg("stop error");
+                },
+
+            }); 
+
+            }
+            function dbg(msg){
+                $("#log").text($("#log").text()+"||||"+msg)
+            }
+
         </script>
     </head>
     
     <body>
-        <table id='idtabjobs'>
-            {% for job in joblist %}
-            <tr id='{{job.id}}'>
-                <td><a href='{{ job.jobu }}' >{{ job.job }}</a></td>
-                <td><a href='{{job.courl}}'>{{ job.coname }}</a></td>
-                <td>{{ job.local }}</td>
-                <td>{{ job.state }}</td>
-                <td>{{ job.udate }}</td>
-                <td>{{ job.sendate }}</td>
-                <td>{{ job.sendcnt }}</td>
-            </tr>
-            {% endfor %}
-        </table>
+        <input type='button' value='test' onclick='showJobs()'>
+        <p id='log'></p>
+        <div id='idivtable'>
+        {% include 'jobfind/viewljobs_table.html' %} <!-- Lesson django template: keep the same dir for included html with in the views.py , otherwith error 500 happend -->
+        </div>
     </body>
 </html>

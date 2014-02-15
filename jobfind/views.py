@@ -18,6 +18,9 @@ from django.utils import simplejson as json
 
 JobDbView=Job #Lesson : varable can point to a class instead of object , like macro in c++
 jobAdder=Job51Adder()
+
+JobLocalDbView=JobL
+
 def index(request):
     print "index in..."
     template = loader.get_template('jobfind/b.html')
@@ -111,12 +114,79 @@ def submitstatus(request):
         print traceback.print_exc()
     #if request.is_ajax():
         
+def dbg(msg):
+    print msg
 def viewljobs(request):
-    template = loader.get_template('jobfind/viewljobs.html')
-    jobs=JobL.objects.filter(Q(state='watch')|Q(state='get')) #Lesson django,orm querry whith OR
-    #jobs=JobL.objects.filter(state='watch')
-    context = Context({
-            'joblist': jobs,
-                })
-    return HttpResponse(template.render(context))
+    try:
+        vlj=ViewLocalJobs()
+        if request.method == 'POST':
+            return vlj.getPostResponse(request)
+        dbg("viewljobs Get")
+        return vlj.getGetResponst(request)
+    except Exception,ex:
+        print Exception,':',ex
+
+
+
+class ViewLocalJobs():
+    def getLocalList(self):
+        locations=(JobLocalDbView.objects.values_list('local').distinct()) #lesson django orm:select on column and distinct
+        utflocals=[]
+        for l in locations:
+            l=list(l)[0].encode('utf8')
+            l=l[:l.find('-')]
+            if l not in utflocals:
+                utflocals.append(l)
+        return utflocals      
+    def getStatusList(self):
+        jobstatus=JobLocalDbView.objects.values_list('state').distinct()
+        utfstatus=[]
+        for l in jobstatus:
+            l=list(l)[0].encode('utf8')
+            if l not in utfstatus:
+                utfstatus.append(l)
+        return utfstatus
    
+    def getGetResponst(self,request):
+        template = loader.get_template('jobfind/viewljobs.html')
+        jobs=JobLocalDbView.objects.filter(Q(state='watch')|Q(state='get')) #Lesson django,orm querry whith OR
+        #jobs=JobL.objects.filter(state='watch')
+        dbg("ViewLocalJobs getGetResponst jobs")
+        context = Context({
+                'jobstatus':self.getStatusList(),
+                'joblocals':self.getLocalList(),
+                'joblist': jobs,
+                    })
+        return HttpResponse(template.render(context))
+    def getPostResponse(self,request):
+        template = loader.get_template('jobfind/viewljobs_table.html')
+        print request.POST
+        local=request.POST.get('local')
+        jobs=JobLocalDbView.objects
+        if len(local)>0:
+            jobs=jobs.filter(local__contains=local)  #Lesson django orm:querry with sql like :colum__xxx
+
+        status=request.POST.get('status')
+        if len(status)>0:
+            jobs=jobs.filter(state__exact=status)
+
+        context = Context({
+                'jobstatus':self.getStatusList(),
+                'joblocals':self.getLocalList(),
+                'joblist': jobs,
+                    })
+
+        return HttpResponse(template.render(context))
+
+        #jobs=JobLocalDbView.objects.filter(Q(state='watch')|Q(state='get')) #Lesson django,orm querry whith OR
+        #return HttpResponse(json.dumps({"code":"post local"}))
+  
+
+
+
+
+
+
+
+
+
