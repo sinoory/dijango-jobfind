@@ -36,6 +36,8 @@
                 workarea:$("#idworkarea").val(),
                 publishday:$("#idpublishday").val(),
             }
+            mHistoryOks.addKey(postdata.searchkey)
+            return
             dbg("loading...")
              var aj = $.ajax( { 
                 type:'post',
@@ -52,10 +54,45 @@
 
             }); 
        }
-        
+
+       function HistoryOptionKeys(idOption){
+            this.idOption=idOption
+            this.keysArr=new Array
+       }
+       HistoryOptionKeys.prototype={
+        initLs:function(){
+             if(typeof localStorage.lastSearchKeys != "undefined"){
+                var lastSearchKeys=JSON.parse(localStorage.lastSearchKeys);
+                this.init(lastSearchKeys)
+            }
+       
+        },
+        init:function(keysArr){
+            this.keysArr=keysArr
+                $.each(lastSearchKeys,function(key,val){
+                    this.addKey(val)
+                })
+
+       },
+       storyLs:function(){
+            localStorage.lastSearchKeys=JSON.stringify(this.keysArr)
+       },
+        addKey:function(key){
+            if($.inArray(key,this.keysArr)==-1){
+                $(this.idOption).append("<option>"+key+"</option>")
+                dbg("select len="+$(this.idOption).length)
+                this.keysArr.push(key)
+                this.storyLs()
+            }
+       },
+        }
+
+        var mHistoryOks=new HistoryOptionKeys("#idhistorykey")
+
         $(document).ready(function(){
             startId={{start_id}}; //template variables
             totalRcd={{total_rcd}};
+            mHistoryOks.initLs()
         });
         function test(){
             //dbg(unescape("{\u82e5\u9690\u82e5\u73b0}"))
@@ -75,6 +112,7 @@
 <option value="020000">上海</option>
 <option value="040000">深圳</option>
 <option value="030200">广州</option>
+<option value="000000">全国</option>
 </select>
 
 <br>
@@ -85,12 +123,13 @@
 <option value="1">近一天</option>
 <option value="2">近两天</option>
 <option value="3">近三天</option>
+<option value="4">近一周</option>
 </select>
 
 <br>
 
 关键词<textarea cols="20" rows="1" id="idsearchkey"></textarea><br>
-
+history<select id='idhistorykey'><select><br>
 <button onclick="querry()">查询</button>
 <button onclick="stopquerry()">停止</button>
 <br>
