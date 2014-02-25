@@ -33,7 +33,7 @@
         function querry(){
             var postdata={
                 searchkey:$("#idsearchkey").val(),
-                workarea:$("#idworkarea").val(),
+                workarea:getJobArea(),
                 publishday:$("#idpublishday").val(),
             }
             mHistoryOks.addKey(postdata.searchkey)
@@ -61,7 +61,8 @@
        HistoryOptionKeys.prototype={
         initLs:function(){
              if(typeof localStorage.lastSearchKeys != "undefined"){
-                var lastSearchKeys=JSON.parse(localStorage.lastSearchKeys);
+                var lastSearchKeys=new Array()
+                lastSearchKeys=JSON.parse(localStorage.lastSearchKeys);
                 dbg("lastSearchKeys="+lastSearchKeys)
                 this.init(lastSearchKeys)
             }
@@ -69,15 +70,15 @@
         },
         init:function(keysArr){
             this.keysArr=keysArr
-                for( var k in keysArr){
-                    this.addKey(k)
+                for( var key in keysArr){
+                    $(this.idOption).append("<option>"+keysArr[key]+"</option>")
                 }
 
        },
        storyLs:function(){
             localStorage.lastSearchKeys=JSON.stringify(this.keysArr)
        },
-        addKey:function(key){
+        addKey:function(key,initflag){
             if($.inArray(key,this.keysArr)==-1){
                 $(this.idOption).append("<option>"+key+"</option>")
                 dbg("select len="+$(this.idOption).length)
@@ -99,6 +100,20 @@
             //dbg(unescape("\u5408\u80a5\u4e2d\u7ee7\u4fe1\u606f\u79d1\u6280\u6709\u9650\u516c\u53f8"))
             //dbg(unescape("Android\u8f6f\u4ef6\u5f00\u53d1\u5de5\u7a0b\u5e08"))
         }
+
+        function getJobArea(){
+           var areas= new Array()
+           //$('input[name=test]').attr('checked',true);
+           $("input[name='idJobArea']").each(function() {
+                if($(this).is(':checked')) //Lesson jquerry:judge checkbox whether selected
+                    areas.push($(this).attr('value'))
+           })
+            return areas.join(",")
+        }
+
+        function selectKeyword(){
+        }
+
         </script>
   <title>querry</title>
 
@@ -107,13 +122,11 @@
 <br>
 
 工作地点
-<select id="idworkarea">
-
-<option value="020000">上海</option>
-<option value="040000">深圳</option>
-<option value="030200">广州</option>
-<option value="000000">全国</option>
-</select>
+<input name='idJobArea' type='checkbox' value="020000" checked="ture">上海</input>
+<input name='idJobArea' type='checkbox' value="040000">深圳</input>
+<input name='idJobArea' type='checkbox' value="030200">广州</input>
+<input name='idJobArea' type='checkbox' value="000000">全国</input>
+<!-- <button onclick='alert(getJobArea())' >test</button> -->
 
 <br>
 
@@ -128,8 +141,8 @@
 
 <br>
 
-关键词<textarea cols="20" rows="1" id="idsearchkey"></textarea><br>
-history<select id='idhistorykey'><select><br>
+关键词<textarea cols="20" rows="1" id="idsearchkey"></textarea>
+history<select id='idhistorykey' onchange="$('#idsearchkey').val($('#idhistorykey').val())" ><select><br>
 <button onclick="querry()">查询</button>
 <button onclick="stopquerry()">停止</button>
 <br>

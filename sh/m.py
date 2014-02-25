@@ -98,11 +98,11 @@ class Job51Adder():
             if len(jobstoped)>0:
                 print jobstoped[0] #the job has expired
                 self.unprocessedUrls.append(BadUrl(url=joburl,reason="Job expired"))
-            if joburl.find("search.51job.com")==-1:
+            elif joburl.find("search.51job.com")==-1:
                 print ("Can't get job description from %s" %(joburl))
                 self.unprocessedUrls.append(BadUrl(url=joburl,reason="invalid job url,Can't get job description"))
-
-            self.unprocessedUrls.append(BadUrl(url=joburl,reason="Unknown reason"))
+            else:
+                self.unprocessedUrls.append(BadUrl(url=joburl,reason="Unknown reason"))
 
         return sjd, scd
 
