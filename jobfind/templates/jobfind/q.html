@@ -8,7 +8,7 @@
   
   <script language="javascript">
         function dbg(msg){
-            $("#console").text(msg);
+            $("#console").html($("#console").html()+"<br>"+msg);
         }
         function stopquerry(){
             var postdata={
@@ -37,7 +37,6 @@
                 publishday:$("#idpublishday").val(),
             }
             mHistoryOks.addKey(postdata.searchkey)
-            return
             dbg("loading...")
              var aj = $.ajax( { 
                 type:'post',
@@ -63,15 +62,16 @@
         initLs:function(){
              if(typeof localStorage.lastSearchKeys != "undefined"){
                 var lastSearchKeys=JSON.parse(localStorage.lastSearchKeys);
+                dbg("lastSearchKeys="+lastSearchKeys)
                 this.init(lastSearchKeys)
             }
        
         },
         init:function(keysArr){
             this.keysArr=keysArr
-                $.each(lastSearchKeys,function(key,val){
-                    this.addKey(val)
-                })
+                for( var k in keysArr){
+                    this.addKey(k)
+                }
 
        },
        storyLs:function(){
@@ -135,6 +135,7 @@ history<select id='idhistorykey'><select><br>
 <br>
 
 <p><a href="/jobfind/index">View getted jobs</a></p>
+<p><a href="/jobfind/viewljobs">View local jobs</a></p>
 
 <br>
 <p id='console'></p>

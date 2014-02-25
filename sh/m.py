@@ -15,9 +15,11 @@ from jobdb import Job,JobDbOpr
 import re
 
 class BadUrl():
-    url=""
-    reason=""
-
+    def __init__(self,url,reason):
+        self.url=url
+        self.reason=reason
+    def __unicode__(self):
+        return "BadUrl<%s,%s>" %(self,url,self.reason)
 
 USER_STOPED=-1
 
@@ -37,7 +39,10 @@ class Job51Adder():
                 print "user stopped,exit addJob"
                 break;
             loop+=1;
-
+        print "====StartPage=%s===Loop=%s=EndPage=%s=================" %(startpage,loop,endpage)
+        print "======================================================"
+        for bu in self.unprocessedUrls:
+            print bu
     def addOnePageJob(self,keyword,jobarea,issuedate,pageindex):
         jbo = JobDbOpr()
         pagesearchurl=("http://search.51job.com/jobsearch/search_result.php?fromJs=1&jobarea="+jobarea+"&district=000000&funtype=0000&industrytype=00&issuedate="+issuedate+"&providesalary=99&keyword="+keyword+"&keywordtype=2&curr_page="+str(pageindex)+"&lang=c&stype=2&postchannel=0000&workyear=99&cotype=99&degreefrom=99&jobterm=01&lonlat=0%2C0&radius=-1&ord_field=0&list_type=0&fromType=14")
@@ -88,16 +93,16 @@ class Job51Adder():
             scd=self.rmHtmlTag(scd)
         except Exception,ex:
             jobstoped=s.findAll("div",{"class":"qxjyxszw"})
+            sjd=""
+            scd=""
             if len(jobstoped)>0:
                 print jobstoped[0] #the job has expired
                 self.unprocessedUrls.append(BadUrl(url=joburl,reason="Job expired"))
-                return "",""
             if joburl.find("search.51job.com")==-1:
                 print ("Can't get job description from %s" %(joburl))
-                self.unprocessedUrls.append(BadUrl(url=joburl,reason="Can't get job description"))
-                return "",""
-            print "Exception in getDescript(%s)" %joburl
-            raise Exception(ex)
+                self.unprocessedUrls.append(BadUrl(url=joburl,reason="invalid job url,Can't get job description"))
+
+            self.unprocessedUrls.append(BadUrl(url=joburl,reason="Unknown reason"))
 
         return sjd, scd
 
