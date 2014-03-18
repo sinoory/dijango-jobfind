@@ -31,12 +31,28 @@
             }); 
         } 
         function querry(){
+        var filterkeysArr=new Array()
+
+        if($("#idselKeytype").val()==0){//querry with company name
+            $("#idsearchkey").val($("#idselCompanys").val())
+            filterkeysArr=mHistoryOks.keysArr
+        }else{//querry with full text
+            if($("#idsearchkey").val().length<2){
+                dbg("Input search key please!")
+                return
+            }
+            filterkeysArr.push($("#idsearchkey").val())
+        }
             var postdata={
                 searchkey:$("#idsearchkey").val(),
                 workarea:getJobArea(),
                 publishday:$("#idpublishday").val(),
+                keywordtype:$("#idselKeytype").val(),
+                filterkeys:filterkeysArr.join(",") 
             }
-            mHistoryOks.addKey(postdata.searchkey)
+            if($("#idselKeytype").val()!=0){//querry with full text
+                mHistoryOks.addKey(postdata.searchkey)
+            }
             dbg("loading...")
              var aj = $.ajax( { 
                 type:'post',
@@ -46,6 +62,20 @@
 		            data = JSON.parse(data);
                     dbg("post res="+data.code)
                     //$("#coname").text(job.coname);
+                    if(data.code=="STOP"){
+                        return
+                    }
+                if($("#idselKeytype").val()==0){//querry with company name
+                    var curIndex=$("#idselCompanys ").get(0).selectedIndex
+                    var maxIndex=$('#idselCompanys option').length-1
+                    dbg("curIndex="+curIndex+",maxIndex="+maxIndex)
+                    if(curIndex<maxIndex){//querry company one by one
+                        curIndex++
+                        $("#idselCompanys ").get(0).selectedIndex=curIndex
+                        querry()
+                    }
+                }
+
                 },
                 error:function(){
                     dbg("error");
@@ -53,7 +83,8 @@
 
             }); 
        }
-
+        function oncompanychanged(){
+        }
        function HistoryOptionKeys(idOption){
             this.idOption=idOption
             this.keysArr=new Array
@@ -86,7 +117,13 @@
                 this.storyLs()
             }
        },
-        }
+         rmCurKey:function(){
+         
+            this.keysArr.pop($(this.idOption).val())
+            $(this.idOption).get(0).options.remove($(this.idOption).get(0).selectedIndex)
+                this.storyLs()
+       },
+       }
 
         var mHistoryOks=new HistoryOptionKeys("#idhistorykey")
 
@@ -99,7 +136,16 @@
             //dbg(unescape("{\u82e5\u9690\u82e5\u73b0}"))
             //dbg(unescape("\u5408\u80a5\u4e2d\u7ee7\u4fe1\u606f\u79d1\u6280\u6709\u9650\u516c\u53f8"))
             //dbg(unescape("Android\u8f6f\u4ef6\u5f00\u53d1\u5de5\u7a0b\u5e08"))
+            //var checkIndex=$("#idselCompanys ").get(0).selectedIndex
+            //var maxIndex=$('#idselCompanys option').length //$("#idselCompanys option:last").attr("index")
+            //            $("#idselCompanys ").get(0).selectedIndex=1
+            //delete select item from options
+            dbg("sel index="+$("#idhistorykey").get(0).selectedIndex)
+            //$("#idhistorykey").get(0).options.remove($("#idhistorykey").get(0).selectedIndex)
+            //mHistoryOks.rmCurKey()
+            dbg("del ok")
         }
+
 
         function getJobArea(){
            var areas= new Array()
@@ -126,7 +172,7 @@
 <input name='idJobArea' type='checkbox' value="040000">深圳</input>
 <input name='idJobArea' type='checkbox' value="030200">广州</input>
 <input name='idJobArea' type='checkbox' value="000000">全国</input>
-<!-- <button onclick='alert(getJobArea())' >test</button> -->
+ <button onclick='test()' >test</button> 
 
 <br>
 
@@ -141,11 +187,26 @@
 
 <br>
 
-关键词<textarea cols="20" rows="1" id="idsearchkey"></textarea>
-history<select id='idhistorykey' onchange="$('#idsearchkey').val($('#idhistorykey').val())" ><select><br>
+<select id='idselKeytype'>
+<option value='2'>以全文查询
+<option value='0'>以公司名查询
+</select>
+<textarea cols="20" rows="1" id="idsearchkey"></textarea>
+history<select id='idhistorykey' onchange="$('#idsearchkey').val($('#idhistorykey').val())" ><select>
+
+<select id='idselCompanys' onchange='oncompanychanged()' >
+<option>HTC
+<option>华为
+<option>中兴
+<option>TCL
+<option>联想
+</select>
+
+<br>
 <button onclick="querry()">查询</button>
 <button onclick="stopquerry()">停止</button>
 <br>
+
 
 <p><a href="/jobfind/index">View getted jobs</a></p>
 <p><a href="/jobfind/viewljobs">View local jobs</a></p>

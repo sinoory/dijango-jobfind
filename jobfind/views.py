@@ -88,10 +88,11 @@ def querry(request):
         keyword=request.POST.get('searchkey')
         if keyword=="STOP":
             jobAdder.userStopped=True
-            return HttpResponse(json.dumps({"code":"stopped"}))
+            return HttpResponse(json.dumps({"code":"STOP"}))
 
         jobarea=request.POST.get('workarea')
         issuedate=request.POST.get('publishday') 
+        jobAdder.setQuerryDict(request.POST)
         if form.is_valid():
             searchkey=request.POST.get('searchkey')
             print "searchkey=%s" %searchkey

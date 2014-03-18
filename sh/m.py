@@ -23,14 +23,27 @@ class BadUrl():
 
 USER_STOPED=-1
 
+class JobStrategy():
+    def isJobSuilt(self,jobstr,keysDict):
+        for k in keysDict:
+            if jobstr.find(k.upper()) != -1:
+                return True
+        return False
+
 class Job51Adder():
     unprocessedUrls=[]
     isRuning=False
     userStopped=False
+    mJobStrategy=JobStrategy()
+    def setQuerryDict(self,querryDict):
+        self.mQuerryDic=querryDict
+        print "setQuerryDict querryDict=%s" %querryDict
+        self.mFilterKeys=querryDict.get("filterkeys").split(",")
+        print "self.mFilterKeys type=%s l=%s" %(type(self.mFilterKeys),self.mFilterKeys)
     def addJob(self,keyword,jobarea,issuedate,startpage=1,endpage=50):
         loop=startpage
         isRuning=True
-        while(loop<=endpage):
+        while(loop<=endpage or endpage==-1):
             jobs,url=self.addOnePageJob(keyword,jobarea,issuedate,loop)
             if jobs==0 :
                 print "Exit,No job in page "+url
@@ -45,7 +58,7 @@ class Job51Adder():
             print bu
     def addOnePageJob(self,keyword,jobarea,issuedate,pageindex):
         jbo = JobDbOpr()
-        pagesearchurl=("http://search.51job.com/jobsearch/search_result.php?fromJs=1&jobarea="+jobarea+"&district=000000&funtype=0000&industrytype=00&issuedate="+issuedate+"&providesalary=99&keyword="+keyword+"&keywordtype=2&curr_page="+str(pageindex)+"&lang=c&stype=2&postchannel=0000&workyear=99&cotype=99&degreefrom=99&jobterm=01&lonlat=0%2C0&radius=-1&ord_field=0&list_type=0&fromType=14")
+        pagesearchurl=("http://search.51job.com/jobsearch/search_result.php?fromJs=1&jobarea="+jobarea+"&district=000000&funtype=0000&industrytype=00&issuedate="+issuedate+"&providesalary=99&keyword="+keyword+"&keywordtype="+self.mQuerryDic.get('keywordtype')+"&curr_page="+str(pageindex)+"&lang=c&stype=2&postchannel=0000&workyear=99&cotype=99&degreefrom=99&jobterm=01&lonlat=0%2C0&radius=-1&ord_field=0&list_type=0&fromType=14")
         reader=HtmlReader(pagesearchurl)
         reader.run()
         soup=BeautifulSoup(reader.outdata)
@@ -70,17 +83,17 @@ class Job51Adder():
                 continue
             job=Job(job=jobname,jobu=jobDetailPageUrl,local=local,coname=company,courl=companyUrl,jd=jd,cd=cd,udate=ud)
             jobstring="%s%s" %(jobname,jd.decode("utf-8")) #TODO why type(jd)=str but type(jobname)=u?
-            if jobstring.upper().find(keyword.upper()) == -1:
-                print "Ignore Job<%s,%s> not contain keyword %s" %(jobname,company,keyword)
+            #if jobstring.upper().find(keyword.upper()) == -1:
+            if not self.mJobStrategy.isJobSuilt(jobstring.upper(),self.mFilterKeys):
+                print "Ignore Job<%s,%s> NOT contain keyword %s" %(jobname,company,self.mFilterKeys)
                 continue
-
             jbo.add(job)
             cnt+=1
         return cnt,pagesearchurl
         #jbo.showAll()
 
     def getDescript(self,joburl):
-        r=HtmlReader(joburl)
+        r=HtmlReader(joburl,timeout=120)
         r.run()
         s=BeautifulSoup(r.outdata)
         try:

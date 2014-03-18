@@ -65,6 +65,7 @@
                     $("#job").html("<a href='"+job.jobu+"' target='_blank' >"+job.job+"<a/>");
                     $("#jobdesc").html(job.jd.replace(/\n/g,"<br/>"));//use html() to show tags
                     $("#jstate").text(job.state)
+                    $("#idjloc").text(job.local)
                     totalRcd=job.jobsCnt
                     endId=startId+totalRcd;
                     $("#idend").text(":"+endId)
@@ -180,7 +181,7 @@
         <p></p>
         <p></p>
         <p></p>
-        <table><tr><td id='jstate'></td><td id='job'></td></tr></table>
+        <table><tr><td id='jstate'></td><td id='job'></td><td id='idjloc'></td></tr></table>
         <p id='coname'></p>
         <p id='codesc'></p>
         <!--
