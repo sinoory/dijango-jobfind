@@ -24,7 +24,7 @@
             {% for job in joblist %}  
             <tr id='{{job.id}}'>          
                 <td><a href='{{ job.jobu }}' target='_blank'  >{{ job.job }}</a></td>
-                <td><a href='{{job.courl}}'>{{ job.coname }}</a></td>                                                            
+                <td><a href='{{job.courl}}'>{{ job.coname |slice:"20"}}</a></td>                                                            
                 <td>{{ job.local }}</td>  
                 <td>{{ job.state }}</td>  
                 <td>{{ job.udate }}</td>  

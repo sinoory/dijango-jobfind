@@ -18,6 +18,9 @@ class BadUrl():
     def __init__(self,url,reason):
         self.url=url
         self.reason=reason
+    def toStr(self):
+        return "BadUrl<%s,%s>" %(self,url,self.reason)
+
     def __unicode__(self):
         return "BadUrl<%s,%s>" %(self,url,self.reason)
 
@@ -43,19 +46,22 @@ class Job51Adder():
     def addJob(self,keyword,jobarea,issuedate,startpage=1,endpage=50):
         loop=startpage
         isRuning=True
+        self.mFinishReason="FINISH_OK"
         while(loop<=endpage or endpage==-1):
             jobs,url=self.addOnePageJob(keyword,jobarea,issuedate,loop)
             if jobs==0 :
                 print "Exit,No job in page "+url
+                self.mFinishReason="REACH_END"
                 break;            
             elif jobs==USER_STOPED:
                 print "user stopped,exit addJob"
+                self.mFinishReason="STOP"
                 break;
             loop+=1;
         print "====StartPage=%s===Loop=%s=EndPage=%s=================" %(startpage,loop,endpage)
         print "======================================================"
         for bu in self.unprocessedUrls:
-            print bu
+            print bu.toStr()
     def addOnePageJob(self,keyword,jobarea,issuedate,pageindex):
         jbo = JobDbOpr()
         pagesearchurl=("http://search.51job.com/jobsearch/search_result.php?fromJs=1&jobarea="+jobarea+"&district=000000&funtype=0000&industrytype=00&issuedate="+issuedate+"&providesalary=99&keyword="+keyword+"&keywordtype="+self.mQuerryDic.get('keywordtype')+"&curr_page="+str(pageindex)+"&lang=c&stype=2&postchannel=0000&workyear=99&cotype=99&degreefrom=99&jobterm=01&lonlat=0%2C0&radius=-1&ord_field=0&list_type=0&fromType=14")

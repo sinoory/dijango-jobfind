@@ -99,12 +99,12 @@ def querry(request):
             return HttpResponse(json.dumps({"code":0}))
         try:
             #raise Exception("test")
-            jobAdder.addJob(keyword,jobarea,issuedate,1,50)
+            jobAdder.addJob(keyword,jobarea,issuedate,1,-1)
             jobAdder.userStopped=False
         except Exception,ex: 
             print Exception,':',ex
             print traceback.print_exc()
-        return HttpResponse(json.dumps({"code":"load job finished"}))
+        return HttpResponse(json.dumps({"code":jobAdder.mFinishReason}))
         
 
 def submitstatus(request):
