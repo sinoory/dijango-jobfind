@@ -1,7 +1,17 @@
 from django.db import models
 
-class AJob(models.Model):
+class JobCompanyScore(models.Model):
     site=models.CharField(max_length=20)
+    job=models.CharField(max_length=100)
+    jobu=models.CharField(max_length=100)
+    coname=models.CharField(max_length=100)
+    courl=models.CharField(max_length=100)
+    score=models.IntegerField(default=0)
+    def __unicode__(self):
+        return "CompanyScore<%s,%s,%s>" %(self.coname,self.score,self.courl)
+
+class AJob(models.Model):
+    site=models.CharField(max_length=20) #51job,zhlian,...
     job=models.CharField(max_length=100)
     jobu=models.CharField(max_length=100)
     local=models.CharField(max_length=20)

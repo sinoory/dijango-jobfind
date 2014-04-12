@@ -5,25 +5,13 @@ from django.utils import simplejson
 import sys,os
 sys.path.append("/home/sin/wkspace/webserver/django/mysite/")
 sys.path.append("/home/sin/wkspace/soft/python/pub/utility/")
-def ormsettingconfig():
-    if settings.configured==True: #Lesson: django judge whether setting is configed
-        return
-    settings.configure( DATABASES = { #Lession : use ORM seprately,must config before import model
-        'default': {
-            'ENGINE': 'django.db.backends.mysql',
-            'NAME': 'db_tst_dj',
-            'USER': 'root',
-            'PASSWORD': 'r',
-            'HOST': '',
-            'CHARSET':'utf-8',
-        }
-    }
-    )
+
+from jangopub import ormsettingconfig
 
 if __name__ == "__main__" :
     ormsettingconfig()
 
-from jobfind.models import Job,JobL
+from jobfind.models import Job,JobL,JobCompanyScore
 from uty import models2json,testobj2dict,modelKeys
 
 
@@ -38,7 +26,42 @@ def mergeTable():
     cmd=""" mysql -uroot --password=r -D db_tst_dj -e " delete from jobfind_job " """
     os.system(cmd)
 
-class JobDbOpr():
+class JobOpr():
+    mExtraInfoDict={}
+    def isJobExist(self,job):
+        return False
+    def isOutData(self,job):
+        return False
+    def add(self,job):
+        pass
+    def update(self,job):
+        pass
+    def setExtraInfo(self,key,value):
+        self.mExtraInfoDict[key]=value
+    def needRender(self): #whether need use qtwebkit to render page to get some js result
+        return False
+
+class JobCompScoreOpr(JobOpr):
+    #local JobCompanyScore store in dicJobCompScr dict{coname,JobCompanyScore}
+    def isJobExist(self,job):
+        #querry whether the job exist in the local db jobl
+        j=JobCompanyScore.objects.filter(coname=job.coname)
+        return len(j)>0 
+    
+    def add(self,job):
+        cc=JobCompanyScore(site=job.site,job=job.job,jobu=job.jobu,coname=job.coname,courl=job.courl,score=self.mExtraInfoDict['score'])
+        print("adding %s" % (cc))
+        cc.save()
+    def isOutData(self,job):
+        j=JobCompanyScore.objects.filter(coname=job.coname).filter(score__lt=self.mExtraInfoDict['score'])
+        return len(j)>0 
+        
+    def needRender(self):
+        return True
+    def update(self,job):
+        JobCompanyScore.objects.filter(coname=job.coname).update(score=self.mExtraInfoDict['score'])
+
+class JobDbOpr(JobOpr):
     def isJobExist(self,job):
         #querry whether the job exist in the local db jobl
         j=Job.objects.filter(jobu=job.jobu)
@@ -69,6 +92,7 @@ class JobDbOpr():
 
 def tstm():
     j=Job()
+    j=JobCompanyScore()
     print modelKeys(j)
 
 
