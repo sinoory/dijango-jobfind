@@ -36,19 +36,25 @@
         if(sechtype==0){//querry with company name
             $("#idsearchkey").val($("#idselCompanys").val())
             filterkeysArr=mHistoryOks.keysArr
-        }else if(sechtype==2 || sechtype==100){//querry with full text or collection company funs
+        }else if(sechtype==2 || sechtype==100 || sechtype==300){
+        //querry with full text or collection company funs || get high funs score companys
             if($("#idsearchkey").val().length<2){
                 dbg("Input search key please!")
                 return
             }
             filterkeysArr.push($("#idsearchkey").val())
         }
+        var extraCmd="NO_CMD"
+        if(sechtype==300){
+            extraCmd="LIST_HIGH_COMPANY"
+        }
             var postdata={
                 searchkey:$("#idsearchkey").val(),
                 workarea:getJobArea(),
                 publishday:$("#idpublishday").val(),
                 keywordtype:$("#idselKeytype").val(),
-                filterkeys:filterkeysArr.join(",") 
+                filterkeys:filterkeysArr.join(","),
+                extracmd:extraCmd
             }
             if($("#idselKeytype").val()==2){//querry with full text
                 mHistoryOks.addKey(postdata.searchkey)
@@ -63,6 +69,11 @@
                     dbg("querry post res="+data.code)
                     //$("#coname").text(job.coname);
                     if(data.code=="STOP"){
+                        return
+                    }else if(data.code=="LIST_HIGH_COMPANY"){
+                        //dbg("companys="+data.res)
+                        //python pass a list object,here data.res is a array already
+                        initSel("#idselScoreCompanys",data.res)
                         return
                     }
                 if($("#idselKeytype").val()==0){//querry with company name
@@ -84,6 +95,12 @@
             }); 
        }
         function oncompanychanged(){
+        }
+        function initSel(idOption,keysArr){
+            $(idOption).empty()
+            for( var key in keysArr){
+                $(idOption).append("<option>"+keysArr[key]+"</option>")
+            }
         }
        function HistoryOptionKeys(idOption){
             this.idOption=idOption
@@ -140,9 +157,14 @@
             //var maxIndex=$('#idselCompanys option').length //$("#idselCompanys option:last").attr("index")
             //            $("#idselCompanys ").get(0).selectedIndex=1
             //delete select item from options
-            dbg("sel index="+$("#idhistorykey").get(0).selectedIndex)
+            //dbg("sel index="+$("#idhistorykey").get(0).selectedIndex)
             //$("#idhistorykey").get(0).options.remove($("#idhistorykey").get(0).selectedIndex)
             //mHistoryOks.rmCurKey()
+                        cmparr=new Array
+                        //cmparr=JSON.parse("华为技术有限公司:125724,欧莱雅（中国）有限公司:71617");
+                        cmparr="HTC:125724,TCL:71617".split(',')
+                        initSel("#idselScoreCompanys",cmparr)
+    
             dbg("del ok")
         }
 
@@ -163,10 +185,12 @@
                 dbg("search jobs from companys,ignore those jobs which do not contain history keys")
             }else if(val==2){
                 dbg("search jobs who contain the pointed key word")
+            }else if(val==300){
+                dbg("querry companys from db who have higher score point by the text")
             }else if(val==100){
                 dbg("scan the companys by the pointed key word,and record its fans number to db")
             }else if(val==200){
-                dbg("")
+                dbg("search jobs from companys,ignore those jobs which do not contain history keys<br>   &emsp;the companys are who have higher score point by the text")
             }
         }
 
@@ -202,10 +226,12 @@
 <option value='2'>以全文查询
 <option value='0'>以公司名查询
 <option value='100'>扫描公司粉丝
+<option value='300'>查询本地粉丝多的公司
 <option value='200'>以公司粉丝排名查询
 </select>
 <textarea cols="20" rows="1" id="idsearchkey"></textarea>
 history<select id='idhistorykey' onchange="$('#idsearchkey').val($('#idhistorykey').val())" ><select>
+
 
 <select id='idselCompanys' onchange='oncompanychanged()' >
 <option>HTC
@@ -227,6 +253,8 @@ history<select id='idhistorykey' onchange="$('#idsearchkey').val($('#idhistoryke
 <option>AMD
 <option>国家仪器
 </select>
+
+<select id="idselScoreCompanys"></select>
 
 <br>
 <button onclick="querry()">查询</button>

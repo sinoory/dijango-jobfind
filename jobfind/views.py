@@ -11,7 +11,7 @@ sys.path.append("/home/sin/wkspace/soft/python/pub/utility/")
 from uty import *
 sys.path.append("/home/sin/wkspace/webserver/django/mysite/sh")
 from m import Job51Adder
-from jobdb import mergeTable
+from jobdb import mergeTable,getCompanyList
 
 from django import forms
 from django.utils import simplejson as json
@@ -89,7 +89,9 @@ def querry(request):
         if keyword=="STOP":
             jobAdder.userStopped=True
             return HttpResponse(json.dumps({"code":"STOP"}))
-
+        if request.POST.get('extracmd')=="LIST_HIGH_COMPANY":
+            lstr=getCompanyList(int(keyword))
+            return HttpResponse(json.dumps({"code":"LIST_HIGH_COMPANY","res":lstr}))
         jobarea=request.POST.get('workarea')
         issuedate=request.POST.get('publishday') 
         jobAdder.setQuerryDict(request.POST)

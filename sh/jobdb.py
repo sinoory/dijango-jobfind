@@ -61,6 +61,13 @@ class JobCompScoreOpr(JobOpr):
     def update(self,job):
         JobCompanyScore.objects.filter(coname=job.coname).update(score=self.mExtraInfoDict['score'])
 
+def getCompanyList(minScore):
+        res=[]
+        ccs=JobCompanyScore.objects.filter(score__gt=minScore).order_by("-score")
+        for cc in ccs:
+            res.append("%s:%s" %(cc.coname,cc.score))
+        return res
+         
 class JobDbOpr(JobOpr):
     def isJobExist(self,job):
         #querry whether the job exist in the local db jobl
@@ -90,6 +97,11 @@ class JobDbOpr(JobOpr):
         return j
 
 
+def tstCcList():
+    res=getCompanyList(5000)
+    for l in res:
+        print l
+
 def tstm():
     j=Job()
     j=JobCompanyScore()
@@ -112,7 +124,6 @@ def testJobDb():
 
 
 if __name__ == "__main__" :
-    tstm()
-
+    tstCcList()
 
 
