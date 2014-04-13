@@ -33,11 +33,19 @@
         function querry(){
         var filterkeysArr=new Array()
         var sechtype=$("#idselKeytype").val()
-        if(sechtype==0){//querry with company name
-            $("#idsearchkey").val($("#idselCompanys").val())
+        var keywordtype=0 //valid value: 0(search with company name) 2(search with full text)
+        var serverActionType=0 //valid value:0(get jobs to job db) 1(get company score to compscore db)
+        if(sechtype==0 || sechtype==200){//querry with company name || funs company name
+            if(sechtype==0){
+                $("#idsearchkey").val($("#idselCompanys").val())
+            }else{
+                $("#idsearchkey").val($("#idselScoreCompanys").val().split(':')[0])
+            }
             filterkeysArr=mHistoryOks.keysArr
         }else if(sechtype==2 || sechtype==100 || sechtype==300){
-        //querry with full text or collection company funs || get high funs score companys
+        //querry with full text || collection company funs || get high funs score companys
+            keywordtype=2
+            serverActionType=1
             if($("#idsearchkey").val().length<2){
                 dbg("Input search key please!")
                 return
@@ -52,9 +60,10 @@
                 searchkey:$("#idsearchkey").val(),
                 workarea:getJobArea(),
                 publishday:$("#idpublishday").val(),
-                keywordtype:$("#idselKeytype").val(),
+                keywordtype:keywordtype,
                 filterkeys:filterkeysArr.join(","),
-                extracmd:extraCmd
+                extracmd:extraCmd,
+                serverActionType:serverActionType
             }
             if($("#idselKeytype").val()==2){//querry with full text
                 mHistoryOks.addKey(postdata.searchkey)
@@ -76,13 +85,14 @@
                         initSel("#idselScoreCompanys",data.res)
                         return
                     }
-                if($("#idselKeytype").val()==0){//querry with company name
-                    var curIndex=$("#idselCompanys ").get(0).selectedIndex
-                    var maxIndex=$('#idselCompanys option').length-1
+                if(sechtype==0 || sechtype==200){//querry with company name || funs company name
+                    var idselcmp=(sechtype==0?"#idselCompanys":"#idselScoreCompanys")
+                    var curIndex=$(idselcmp).get(0).selectedIndex
+                    var maxIndex=$(idselcmp +' option').length-1
                     dbg("curIndex="+curIndex+",maxIndex="+maxIndex)
                     if(curIndex<maxIndex){//querry company one by one
                         curIndex++
-                        $("#idselCompanys ").get(0).selectedIndex=curIndex
+                        $(idselcmp).get(0).selectedIndex=curIndex
                         querry()
                     }
                 }
@@ -160,12 +170,12 @@
             //dbg("sel index="+$("#idhistorykey").get(0).selectedIndex)
             //$("#idhistorykey").get(0).options.remove($("#idhistorykey").get(0).selectedIndex)
             //mHistoryOks.rmCurKey()
-                        cmparr=new Array
+                 //       cmparr=new Array
                         //cmparr=JSON.parse("华为技术有限公司:125724,欧莱雅（中国）有限公司:71617");
-                        cmparr="HTC:125724,TCL:71617".split(',')
-                        initSel("#idselScoreCompanys",cmparr)
+                 //       cmparr="HTC:125724,TCL:71617".split(',')
+                 //       initSel("#idselScoreCompanys",cmparr)
     
-            dbg("del ok")
+            dbg($("#idselScoreCompanys").val().split(':')[0])
         }
 
 
@@ -180,6 +190,7 @@
         }
 
         function keytypechanged(){
+            $("#idsearchkey").val("")
             var val=$("#idselKeytype").val()
             if(val==0){
                 dbg("search jobs from companys,ignore those jobs which do not contain history keys")
@@ -234,6 +245,7 @@ history<select id='idhistorykey' onchange="$('#idsearchkey').val($('#idhistoryke
 
 
 <select id='idselCompanys' onchange='oncompanychanged()' >
+<option>IBM China
 <option>HTC
 <option>华为技术
 <option>中兴通讯

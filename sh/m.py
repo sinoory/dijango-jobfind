@@ -6,6 +6,7 @@ sys.path.append("/home/sin/wkspace/soft/python/pub/utility/")
 from getPage import HtmlReader
 from QtPage import Render
 from uty import *
+import urllib
 
 from bs4 import BeautifulSoup
 
@@ -90,14 +91,14 @@ class RenderHtmlGetStrategy(HtmlGetStrategy):
 
 class StrategyFactory():
     def __init__(self,factype):
-        if factype==0 or factype==2 :
-            self.htmlGetor=HtmlGetStrategy()
-            self.jobOpr=JobDbOpr()
-            print "StrategyFactory[HtmlGetStrategy,JobDbOpr]"
-        elif factype==100:
+        if factype==1:
             self.htmlGetor=RenderHtmlGetStrategy()
             self.jobOpr=JobCompScoreOpr()
             print "StrategyFactory[RenderHtmlGetStrategy,JobCompScoreOpr]"
+        else:
+            self.htmlGetor=HtmlGetStrategy()
+            self.jobOpr=JobDbOpr()
+            print "StrategyFactory[HtmlGetStrategy,JobDbOpr]"
 
 class Job51Adder():
     unprocessedUrls=[]
@@ -110,7 +111,8 @@ class Job51Adder():
         self.mFilterKeys=querryDict.get("filterkeys").split(",")
         print "self.mFilterKeys type=%s l=%s" %(type(self.mFilterKeys),self.mFilterKeys)
     def addJob(self,keyword,jobarea,issuedate,startpage=1,endpage=50):
-        strategyFactory=StrategyFactory(int(self.mQuerryDic['keywordtype']))
+        keyword=urllib.quote(keyword.encode('utf-8'))
+        strategyFactory=StrategyFactory(int(self.mQuerryDic['serverActionType']))
         self.mJobOprStrategy=strategyFactory.jobOpr
         self.mHtmlGetStrategy=strategyFactory.htmlGetor
 
@@ -204,7 +206,7 @@ class Job51Adder():
                 self.mHtmlGetStrategy.mExtralInfo['score']=-1
                 score=s.findAll('a',{"id":"company_url"})[0].get_text().strip()[4:][:-1]
                 self.mHtmlGetStrategy.mExtralInfo['score']=score
-                print score
+                print "%s , %s" %(score,joburl)
         except Exception,ex:
             #print "%s" %outdata
             err= "Exception ex=%s in getDescript(%s),saved data in Error.txt" %(ex,joburl)
