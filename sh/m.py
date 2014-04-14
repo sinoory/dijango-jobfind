@@ -29,7 +29,7 @@ class BadUrl():
         return "BadUrl<%s,%s>" %(self.url,self.reason)
 
     def __unicode__(self):
-        return "BadUrl<%s,%s>" %(self,url,self.reason)
+        return "BadUrl<%s , %s>" %(self,url,self.reason)
 
 USER_STOPED=-1
 
@@ -42,6 +42,7 @@ class JobStrategy():
 
 class HtmlGetStrategy():
     mExtralInfo={'jobDescribe':'','companyDesc':''}
+    lastDescConame=[]
     def load(self,url):
         r=HtmlReader(url,timeout=120)
         r.run()
@@ -61,6 +62,9 @@ class HtmlGetStrategy():
     def isDescValid(self):
         return len(self.mExtralInfo['jobDescribe'])>5
 
+    def needIgnoreCompany(self,coname):
+        return False
+
 import multiprocessing
 def getHtml(url,outPipe):
     r=Render()
@@ -73,7 +77,7 @@ class RenderHtmlGetStrategy(HtmlGetStrategy):
         pipe=multiprocessing.Pipe()
         p = multiprocessing.Process(target=getHtml, args=(url,pipe[0], ))
         p.start()
-        p.join()
+        p.join(2)
 
         self.date="%s" %pipe[1].recv()
     def data(self):
@@ -88,6 +92,13 @@ class RenderHtmlGetStrategy(HtmlGetStrategy):
 
     def isDescValid(self):
         return self.mExtralInfo['score']>=0
+
+    def needIgnoreCompany(self,nowconame):
+        if not nowconame in self.lastDescConame :
+            self.lastDescConame.append(nowconame)
+            print "Current Total companys : %d" %(len(self.lastDescConame))
+            return False
+        return True
 
 class StrategyFactory():
     def __init__(self,factype):
@@ -105,6 +116,10 @@ class Job51Adder():
     isRuning=False
     userStopped=False
     mJobStrategy=JobStrategy()
+    def init(self):
+        self.unprocessedUrls=[]
+        self.userStopped=False
+        self.mHtmlGetStrategy.lastDescConame=[]
     def setQuerryDict(self,querryDict):
         self.mQuerryDic=querryDict
         print "setQuerryDict querryDict=%s" %querryDict
@@ -115,6 +130,7 @@ class Job51Adder():
         strategyFactory=StrategyFactory(int(self.mQuerryDic['serverActionType']))
         self.mJobOprStrategy=strategyFactory.jobOpr
         self.mHtmlGetStrategy=strategyFactory.htmlGetor
+        self.init()
 
         loop=startpage
         isRuning=True
@@ -138,7 +154,7 @@ class Job51Adder():
     def addOnePageJob(self,keyword,jobarea,issuedate,pageindex):
         jbo = self.mJobOprStrategy #JobCompScoreOpr() #JobDbOpr()
         pagesearchurl=("http://search.51job.com/jobsearch/search_result.php?fromJs=1&jobarea="+jobarea+"&district=000000&funtype=0000&industrytype=00&issuedate="+issuedate+"&providesalary=99&keyword="+keyword+"&keywordtype="+self.mQuerryDic.get('keywordtype')+"&curr_page="+str(pageindex)+"&lang=c&stype=2&postchannel=0000&workyear=99&cotype=99&degreefrom=99&jobterm=01&lonlat=0%2C0&radius=-1&ord_field=0&list_type=0&fromType=14")
-        reader=HtmlReader(pagesearchurl)
+        reader=HtmlReader(pagesearchurl,retrycnt=5)
         reader.run()
         soup=BeautifulSoup(reader.outdata)
         print "process %s" %pagesearchurl
@@ -161,7 +177,9 @@ class Job51Adder():
             ud=cols[4].get_text()
             self.mHtmlGetStrategy.mExtralInfo['jobDetailPageUrl']=jobDetailPageUrl
             self.mHtmlGetStrategy.mExtralInfo['companyUrl']=companyUrl
-            
+            if self.mHtmlGetStrategy.needIgnoreCompany(company):
+                print "Ignore company %s,the same as last one" %company
+                continue
             self.getDescript(self.mHtmlGetStrategy.getDescribeIntrestingUrl())
             jd=self.mHtmlGetStrategy.mExtralInfo['jobDescribe']
             cd=self.mHtmlGetStrategy.mExtralInfo['companyDesc']
@@ -189,8 +207,8 @@ class Job51Adder():
         self.mHtmlGetStrategy.load(joburl)
         outdata=self.mHtmlGetStrategy.data()
         #print outdata
-        s=BeautifulSoup(outdata)
         try:
+            s=BeautifulSoup(outdata)
             if self.mHtmlGetStrategy.needJobCompDesc():
                 jd=s.findAll("td",{"class":"txt_4 wordBreakNormal job_detail "})[0]
                 sjd="%s" %jd
@@ -212,7 +230,7 @@ class Job51Adder():
             err= "Exception ex=%s in getDescript(%s),saved data in Error.txt" %(ex,joburl)
             print err
             saveFile("%s" %(err),"Error.txt",'a')
-            saveFile("%s" %(outdata),"Error.txt",'a')
+            #saveFile("%s" %(outdata),"Error.txt",'a')
             #exit() 
             #print traceback.print_exc()
             jobstoped=s.findAll("div",{"class":"qxjyxszw"})

@@ -53,12 +53,18 @@ class JobCompScoreOpr(JobOpr):
         print("adding %s" % (cc))
         cc.save()
     def isOutData(self,job):
-        j=JobCompanyScore.objects.filter(coname=job.coname).filter(score__lt=self.mExtraInfoDict['score'])
-        return len(j)>0 
+        oldscore=JobCompanyScore.objects.filter(coname=job.coname)[0].score
+        newscore=self.mExtraInfoDict['score']
+        if(int(oldscore)<int(newscore)):
+            print "oldscore[%s]<newscore[%s],need update" %(oldscore,newscore)
+            return True
+        return False
+        #j=JobCompanyScore.objects.filter(coname=job.coname).filter(score__lt=self.mExtraInfoDict['score'])
         
     def needRender(self):
         return True
     def update(self,job):
+        print ("updating company %s" %(job.coname))
         JobCompanyScore.objects.filter(coname=job.coname).update(score=self.mExtraInfoDict['score'])
 
 def getCompanyList(minScore):

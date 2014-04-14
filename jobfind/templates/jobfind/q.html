@@ -30,6 +30,27 @@
 
             }); 
         } 
+        
+        function Cmd(cmdName){
+            this.cmdName=cmdName
+        }
+        Cmd.prototype={
+            showElement:function(){
+                dbg("Cmd["+this.cmdName+"]:showElement")
+            },
+            hideElement:function(){
+            },
+            getQuerryJson:function(){
+            },
+        }
+        function CmdQuerry(cmdName){
+            Cmd.call(this,cmdName)
+        }
+        CmdQuerry.prototype=new Cmd()
+        CmdQuerry.prototype.getQuerryJson=function(){
+        }
+
+
         function querry(){
         var filterkeysArr=new Array()
         var sechtype=$("#idselKeytype").val()
@@ -83,6 +104,7 @@
                         //dbg("companys="+data.res)
                         //python pass a list object,here data.res is a array already
                         initSel("#idselScoreCompanys",data.res)
+                        dbg("companys num="+$("#idselScoreCompanys option").length)
                         return
                     }
                 if(sechtype==0 || sechtype==200){//querry with company name || funs company name
@@ -175,7 +197,11 @@
                  //       cmparr="HTC:125724,TCL:71617".split(',')
                  //       initSel("#idselScoreCompanys",cmparr)
     
-            dbg($("#idselScoreCompanys").val().split(':')[0])
+            //dbg($("#idselScoreCompanys").val().split(':')[0]
+
+            c=new CmdQuerry("cmd_q")
+            c.showElement()
+
         }
 
 

@@ -153,7 +153,7 @@ class ViewLocalJobs():
    
     def getGetResponst(self,request):
         template = loader.get_template('jobfind/viewljobs.html')
-        jobs=JobLocalDbView.objects.filter(Q(state='watch')|Q(state='get')) #Lesson django,orm querry whith OR
+        jobs=JobLocalDbView.objects.filter(Q(state='watch')|Q(state='get')).order_by("-id") #Lesson django,orm querry whith OR
         #jobs=JobL.objects.filter(state='watch')
         dbg("ViewLocalJobs getGetResponst jobs")
         context = Context({
