@@ -10,11 +10,16 @@
         function dbg(msg){
             $("#console").html(msg+"<br>"+$("#console").html());
         }
+        function startquerry(){
+            curCmd.onStart()
+            querry()
+        }
         function stopquerry(){
             var postdata={
                 searchkey:"STOP",
             }
             dbg("stop...")
+            curCmd.mUserStoped=true
              var aj = $.ajax( { 
                 type:'post',
                 cache:'false',
@@ -30,102 +35,233 @@
 
             }); 
         } 
-        
-        function Cmd(cmdName){
-            this.cmdName=cmdName
+       
+        var KEYWORDTYPE_SEARCH_WITH_FULL_TEXT=2
+        var KEYWORDTYPE_SEARCH_WITH_COMPANY_NAME=0
+        var SEVER_ACTION_GET_JOBS_TO_DB=0
+        var SEVER_ACTION_SCAN_COMPANY_SCORE_TO_DB=1
+        var CMD_SEATCH_WITH_COMPANY_NAME=0
+        var CMD_SEATCH_WITH_FULL_TEXT=2
+        function Cmd(){
+            this.cmdName="NoCmd"
+            this.mIdSearchKey="#idsearchkey"
+            this.mKeywordSearchType=KEYWORDTYPE_SEARCH_WITH_FULL_TEXT
+            this.mExtraCmd="NO_CMD"
+            this.mSeverAction=SEVER_ACTION_GET_JOBS_TO_DB
+            this.mMustContainKeys=new Array()
+            this.mUserStoped=false
         }
         Cmd.prototype={
-            showElement:function(){
+            showorhideElement:function(bshow){
                 dbg("Cmd["+this.cmdName+"]:showElement")
             },
-            hideElement:function(){
+            isInputValid:function(){
+                if($(this.mIdSearchKey).val().length<2){
+                    dbg("["+this.cmdName+"]Input search key please!")
+                    return false
+                }
+                return true
+            },
+            prepData:function(){
+            },
+            onStart:function(){
             },
             getQuerryJson:function(){
-            },
-        }
-        function CmdQuerry(cmdName){
-            Cmd.call(this,cmdName)
-        }
-        CmdQuerry.prototype=new Cmd()
-        CmdQuerry.prototype.getQuerryJson=function(){
-        }
-
-
-        function querry(){
-        var filterkeysArr=new Array()
-        var sechtype=$("#idselKeytype").val()
-        var keywordtype=0 //valid value: 0(search with company name) 2(search with full text)
-        var serverActionType=0 //valid value:0(get jobs to job db) 1(get company score to compscore db)
-        if(sechtype==0 || sechtype==200){//querry with company name || funs company name
-            if(sechtype==0){
-                $("#idsearchkey").val($("#idselCompanys").val())
-            }else{
-                $("#idsearchkey").val($("#idselScoreCompanys").val().split(':')[0])
-            }
-            filterkeysArr=mHistoryOks.keysArr
-        }else if(sechtype==2 || sechtype==100 || sechtype==300){
-        //querry with full text || collection company funs || get high funs score companys
-            keywordtype=2
-            serverActionType=1
-            if($("#idsearchkey").val().length<2){
-                dbg("Input search key please!")
-                return
-            }
-            filterkeysArr.push($("#idsearchkey").val())
-        }
-        var extraCmd="NO_CMD"
-        if(sechtype==300){
-            extraCmd="LIST_HIGH_COMPANY"
-        }
             var postdata={
-                searchkey:$("#idsearchkey").val(),
+                searchkey:$(this.mIdSearchKey).val(),
                 workarea:getJobArea(),
                 publishday:$("#idpublishday").val(),
-                keywordtype:keywordtype,
-                filterkeys:filterkeysArr.join(","),
-                extracmd:extraCmd,
-                serverActionType:serverActionType
+                keywordtype:this.mKeywordSearchType,
+                filterkeys:this.mMustContainKeys.join(","),
+                extracmd:this.mExtraCmd,
+                serverActionType:this.mSeverAction
             }
+                return postdata
+            },
+            getHelpStr:function(){
+                return "UnImplement"
+            },
+            onSuccessRes:function(data){
+            },
+        }
+        //=================CmdQuerry=============
+        function CmdQuerry(){
+            Cmd.call(this)
+            this.cmdName="Cmd_querry_full_text"
+        }
+        CmdQuerry.prototype=new Cmd()
+        CmdQuerry.prototype.prepData=function(){
+            this.mMustContainKeys=mHistoryOks.keysArr
+        }
+        CmdQuerry.prototype.showorhideElement=function(bshow){
+            if(bshow){
+                $("#idsearchkey").show()
+            }else{
+                $("#idsearchkey").hide()
+            }
+        }
+        //================CmdQuerryFavorCmpanys=======
+        function CmdQuerryFavorCmpanys(){
+            Cmd.call(this)
+            this.cmdName="Cmd_querry_favor_companys"
+            this.mKeywordSearchType=KEYWORDTYPE_SEARCH_WITH_COMPANY_NAME
+        }
+        CmdQuerryFavorCmpanys.prototype=new Cmd()
+        CmdQuerryFavorCmpanys.prototype.prepData=function(){
+            this.mMustContainKeys=mHistoryOks.keysArr
+        }
+        CmdQuerryFavorCmpanys.prototype.showorhideElement=function(bshow){
+            if(bshow){
+                $("#idselCompanys").show()
+                $("#idsearchkey").show()
+            }else{
+                $("#idselCompanys").hide()
+                $("#idsearchkey").hide()
+            }
+        }
+        CmdQuerryFavorCmpanys.prototype.isInputValid=function(){return true}
+        CmdQuerryFavorCmpanys.prototype.prepData=function(){
+            $("#idsearchkey").val($("#idselCompanys").val())
+        }
+        CmdQuerryFavorCmpanys.prototype.onSuccessRes=function(data){
+            companyLoopQuerry("#idselCompanys",this.cmdName,this.mUserStoped) 
+        }
+        //===============CmdQuerryHighScoreCmpanys==========
+        function CmdQuerryHighScoreCmpanys(){
+            Cmd.call(this)
+            this.cmdName="Cmd_querry_high_score_companys"
+            this.mKeywordSearchType=KEYWORDTYPE_SEARCH_WITH_COMPANY_NAME
+        }
+        CmdQuerryHighScoreCmpanys.prototype=new Cmd()
+        CmdQuerryHighScoreCmpanys.prototype.prepData=function(){
+            this.mMustContainKeys=mHistoryOks.keysArr
+            $('#idsearchkey').val($('#idselScoreCompanys').val().split(':')[0])
+        }
+        CmdQuerryHighScoreCmpanys.prototype.showorhideElement=function(bshow){
+            if(bshow){
+                $("#idselScoreCompanys").show()
+                $("#idsearchkey").show()
+            }else{
+                $("#idselScoreCompanys").hide()
+                $("#idsearchkey").hide()
+            }
+        }
+        CmdQuerryHighScoreCmpanys.prototype.isInputValid=function(){return true}
+        CmdQuerryHighScoreCmpanys.prototype.onSuccessRes=function(data){
+            companyLoopQuerry("#idselScoreCompanys",this.cmdName,this.mUserStoped) 
+        }
+        //==============CmdScanHighScoreCmpanys===========
+        function CmdScanHighScoreCmpanys(){
+            Cmd.call(this)
+            this.cmdName="Cmd_scan_high_score_companys"
+            this.mSeverAction=SEVER_ACTION_SCAN_COMPANY_SCORE_TO_DB
+            this.isLoopScan=false
+        }
+        CmdScanHighScoreCmpanys.prototype=new Cmd()
+        CmdScanHighScoreCmpanys.prototype.prepData=function(){
+            this.mMustContainKeys=mHistoryOks.keysArr
+        }
+        CmdScanHighScoreCmpanys.prototype.showorhideElement=function(bshow){
+            if(bshow){
+                $("#idsearchkey").show()
+            }else{
+                $("#idsearchkey").hide()
+            }
+        }
+        CmdScanHighScoreCmpanys.prototype.onStart=function(){
+            if($(this.mIdSearchKey).val().length<2){
+                this.isLoopScan=true
+            }else{
+                this.isLoopScan=false
+            }
+            dbg("CmdScanHighScoreCmpanys onStart,isLoopScan="+this.isLoopScan)
+        }
+        CmdScanHighScoreCmpanys.prototype.isInputValid=function(){
+            $('#idsearchkey').val($('#idhistorykey').val())           
+            return true
+        }
+        CmdScanHighScoreCmpanys.prototype.prepData=function(){
+            dbg("CmdScanHighScoreCmpanys prepData,isLoopScan="+this.isLoopScan)
+            if(this.isLoopScan) {
+                $('#idsearchkey').val($('#idhistorykey').val())
+            }
+        }
+        CmdScanHighScoreCmpanys.prototype.onSuccessRes=function(data){
+            dbg("CmdScanHighScoreCmpanys onSuccessRes,isLoopScan="+this.isLoopScan)
+            if(!this.isLoopScan){
+                return
+            }
+            companyLoopQuerry("#idhistorykey",this.cmdName,this.mUserStoped) 
+        }
+       //=============CmdShowHighScoreCmpanys==========
+        function CmdShowHighScoreCmpanys(){
+            Cmd.call(this)
+            this.cmdName="Cmd_show_high_score_companys"
+            this.mExtraCmd="LIST_HIGH_COMPANY"
+        }
+        CmdShowHighScoreCmpanys.prototype=new Cmd()
+        CmdShowHighScoreCmpanys.prototype.showorhideElement=function(bshow){
+            if(bshow){
+                $("#idsearchkey").show()
+                $("#idselScoreCompanys").show()
+            }else{
+                $("#idselScoreCompanys").hide()
+                $("#idsearchkey").hide()
+            }
+        }
+        CmdShowHighScoreCmpanys.prototype.onSuccessRes=function(data){
+            initSel("#idselScoreCompanys",data.res)
+            dbg("companys num="+$("#idselScoreCompanys option").length)
+        }
+
+
+        function companyLoopQuerry(idselcmp,cmdName,userStoped){
+            //var idselcmp=(sechtype==0?"#idselCompanys":"#idselScoreCompanys")
+            if(userStoped){
+                dbg("["+cmdName+"] User stoped")
+                return
+            }
+           
+            var curIndex=$(idselcmp).get(0).selectedIndex
+            var maxIndex=$(idselcmp +' option').length-1
+            dbg("curIndex="+curIndex+",maxIndex="+maxIndex)
+            if(curIndex<maxIndex){//querry company one by one
+                curIndex++
+                $(idselcmp).get(0).selectedIndex=curIndex
+                querry()
+            }
+            return curIndex<maxIndex
+       }
+
+        var curCmd=new CmdQuerry()
+        var preCmd=curCmd
+
+        function querry(){
+            curCmd.mUserStoped=false
+            if(! curCmd.isInputValid()){
+                return
+            }
+            curCmd.prepData()
+            var postdata=curCmd.getQuerryJson()
             if($("#idselKeytype").val()==2){//querry with full text
                 mHistoryOks.addKey(postdata.searchkey)
             }
             dbg("loading...")
-             var aj = $.ajax( { 
+            var aj = $.ajax( { 
                 type:'post',
                 cache:'false',
                 data:postdata,
                 success:function(data){
 		            data = JSON.parse(data);
                     dbg("querry post res="+data.code)
-                    //$("#coname").text(job.coname);
-                    if(data.code=="STOP"){
-                        return
-                    }else if(data.code=="LIST_HIGH_COMPANY"){
-                        //dbg("companys="+data.res)
-                        //python pass a list object,here data.res is a array already
-                        initSel("#idselScoreCompanys",data.res)
-                        dbg("companys num="+$("#idselScoreCompanys option").length)
-                        return
-                    }
-                if(sechtype==0 || sechtype==200){//querry with company name || funs company name
-                    var idselcmp=(sechtype==0?"#idselCompanys":"#idselScoreCompanys")
-                    var curIndex=$(idselcmp).get(0).selectedIndex
-                    var maxIndex=$(idselcmp +' option').length-1
-                    dbg("curIndex="+curIndex+",maxIndex="+maxIndex)
-                    if(curIndex<maxIndex){//querry company one by one
-                        curIndex++
-                        $(idselcmp).get(0).selectedIndex=curIndex
-                        querry()
-                    }
-                }
-
+                    curCmd.onSuccessRes(data)
                 },
                 error:function(){
                     dbg("error");
                 },
 
             }); 
-       }
+        }
         function oncompanychanged(){
         }
         function initSel(idOption,keysArr){
@@ -199,8 +335,8 @@
     
             //dbg($("#idselScoreCompanys").val().split(':')[0]
 
-            c=new CmdQuerry("cmd_q")
-            c.showElement()
+            c=new CmdQuerryHighScoreCmpanys()
+            c.showorhideElement(true)
 
         }
 
@@ -218,17 +354,20 @@
         function keytypechanged(){
             $("#idsearchkey").val("")
             var val=$("#idselKeytype").val()
-            if(val==0){
-                dbg("search jobs from companys,ignore those jobs which do not contain history keys")
-            }else if(val==2){
-                dbg("search jobs who contain the pointed key word")
-            }else if(val==300){
-                dbg("querry companys from db who have higher score point by the text")
+            preCmd.showorhideElement(false)
+            preCmd=curCmd
+            if(val==2){
+                curCmd=new CmdQuerry()
+            }else if(val==0){
+                curCmd=new CmdQuerryFavorCmpanys()
             }else if(val==100){
-                dbg("scan the companys by the pointed key word,and record its fans number to db")
+                curCmd=new CmdScanHighScoreCmpanys()
+            }else if(val==300){
+                curCmd=new CmdShowHighScoreCmpanys()
             }else if(val==200){
-                dbg("search jobs from companys,ignore those jobs which do not contain history keys<br>   &emsp;the companys are who have higher score point by the text")
+                curCmd=new CmdQuerryHighScoreCmpanys()
             }
+            curCmd.showorhideElement(true)
         }
 
         </script>
@@ -270,7 +409,7 @@
 history<select id='idhistorykey' onchange="$('#idsearchkey').val($('#idhistorykey').val())" ><select>
 
 
-<select id='idselCompanys' onchange='oncompanychanged()' >
+<select id='idselCompanys' onchange='oncompanychanged()' style="display: none" >
 <option>IBM China
 <option>HTC
 <option>华为技术
@@ -292,10 +431,10 @@ history<select id='idhistorykey' onchange="$('#idsearchkey').val($('#idhistoryke
 <option>国家仪器
 </select>
 
-<select id="idselScoreCompanys"></select>
+<select id="idselScoreCompanys" style="display: none"></select>
 
 <br>
-<button onclick="querry()">查询</button>
+<button onclick="startquerry()">查询</button>
 <button onclick="stopquerry()">停止</button>
 <br>
 
