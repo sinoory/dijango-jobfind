@@ -4,7 +4,7 @@ import sys
 sys.path.append("/home/sin/wkspace/soft/python/pub/web/")
 sys.path.append("/home/sin/wkspace/soft/python/pub/utility/")
 from getPage import HtmlReader
-from QtPage import Render
+from QtPage import Render,WebkitRender
 from uty import *
 import urllib
 
@@ -32,6 +32,7 @@ class BadUrl():
         return "BadUrl<%s , %s>" %(self,url,self.reason)
 
 USER_STOPED=-1
+UNDEFINDED=-2
 
 class JobStrategy():
     def isJobSuilt(self,jobstr,keysDict):
@@ -65,21 +66,12 @@ class HtmlGetStrategy():
     def needIgnoreCompany(self,coname):
         return False
 
-import multiprocessing
-def getHtml(url,outPipe):
-    r=Render()
-    r.load(url)
-    outPipe.send(r.outdata)
 
 class RenderHtmlGetStrategy(HtmlGetStrategy):
     def load(self,url):
-        #python lesson : use process and pipe to get data
-        pipe=multiprocessing.Pipe()
-        p = multiprocessing.Process(target=getHtml, args=(url,pipe[0], ))
-        p.start()
-        p.join(2)
-
-        self.date="%s" %pipe[1].recv()
+        wr=WebkitRender(url,60,5)
+        wr.load()
+        self.date="%s" %wr.data()
     def data(self):
         return self.date
 
@@ -137,7 +129,14 @@ class Job51Adder():
         self.mFinishReason="FINISH_OK"
         st=getCurTime() #from uty.py
         while(loop<=endpage or endpage==-1):
-            jobs,url=self.addOnePageJob(keyword,jobarea,issuedate,loop)
+            jobs=UNDEFINDED
+            try:
+                jobs,url=self.addOnePageJob(keyword,jobarea,issuedate,loop)
+            except Exception,ex:
+                err= "Exception ex=%s in addOnePageJob ,saved data in Error.txt" %(ex)
+                print err
+                saveFile("%s\n" %(err),"Error.txt",'a')
+               
             if jobs==0 :
                 print "Exit,No job in page "+url
                 self.mFinishReason="REACH_END"
@@ -229,7 +228,7 @@ class Job51Adder():
             #print "%s" %outdata
             err= "Exception ex=%s in getDescript(%s),saved data in Error.txt" %(ex,joburl)
             print err
-            saveFile("%s" %(err),"Error.txt",'a')
+            saveFile("%s\n" %(err),"Error.txt",'a')
             #saveFile("%s" %(outdata),"Error.txt",'a')
             #exit() 
             #print traceback.print_exc()

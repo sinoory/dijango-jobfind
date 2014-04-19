@@ -50,6 +50,7 @@
             this.mSeverAction=SEVER_ACTION_GET_JOBS_TO_DB
             this.mMustContainKeys=new Array()
             this.mUserStoped=false
+            this.mStartTm=""
         }
         Cmd.prototype={
             showorhideElement:function(bshow){
@@ -65,6 +66,7 @@
             prepData:function(){
             },
             onStart:function(){
+                this.mStartTm=new Date()
             },
             getQuerryJson:function(){
             var postdata={
@@ -124,7 +126,9 @@
             $("#idsearchkey").val($("#idselCompanys").val())
         }
         CmdQuerryFavorCmpanys.prototype.onSuccessRes=function(data){
-            companyLoopQuerry("#idselCompanys",this.cmdName,this.mUserStoped) 
+            if(!companyLoopQuerry("#idselCompanys",this.cmdName,this.mUserStoped)){
+                dbg("Cmd["+this.cmdName+"] "+this.mStartTm+"====>"+(new Date()))
+            }
         }
         //===============CmdQuerryHighScoreCmpanys==========
         function CmdQuerryHighScoreCmpanys(){
@@ -148,7 +152,9 @@
         }
         CmdQuerryHighScoreCmpanys.prototype.isInputValid=function(){return true}
         CmdQuerryHighScoreCmpanys.prototype.onSuccessRes=function(data){
-            companyLoopQuerry("#idselScoreCompanys",this.cmdName,this.mUserStoped) 
+            if(!companyLoopQuerry("#idselScoreCompanys",this.cmdName,this.mUserStoped)){
+                dbg("Cmd["+this.cmdName+"] "+this.mStartTm+"====>"+(new Date()))
+            }
         }
         //==============CmdScanHighScoreCmpanys===========
         function CmdScanHighScoreCmpanys(){
@@ -169,6 +175,7 @@
             }
         }
         CmdScanHighScoreCmpanys.prototype.onStart=function(){
+            Cmd.prototype.onStart.apply(this) //call parent function first 
             if($(this.mIdSearchKey).val().length<2){
                 this.isLoopScan=true
             }else{
@@ -188,6 +195,9 @@
         }
         CmdScanHighScoreCmpanys.prototype.onSuccessRes=function(data){
             dbg("CmdScanHighScoreCmpanys onSuccessRes,isLoopScan="+this.isLoopScan)
+            if(!this.isLoopScan || this.mUserStoped){
+                dbg("CmdScanHighScoreCmpanys "+this.mStartTm+"====>"+(new Date()))
+            }
             if(!this.isLoopScan){
                 return
             }
@@ -219,7 +229,7 @@
             //var idselcmp=(sechtype==0?"#idselCompanys":"#idselScoreCompanys")
             if(userStoped){
                 dbg("["+cmdName+"] User stoped")
-                return
+                return false
             }
            
             var curIndex=$(idselcmp).get(0).selectedIndex
@@ -335,8 +345,10 @@
     
             //dbg($("#idselScoreCompanys").val().split(':')[0]
 
-            c=new CmdQuerryHighScoreCmpanys()
-            c.showorhideElement(true)
+            //c=new CmdQuerryHighScoreCmpanys()
+            //c.showorhideElement(true)
+            var d=new Date()
+            dbg(d)
 
         }
 

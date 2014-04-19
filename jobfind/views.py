@@ -4,7 +4,7 @@ import os
 from django.http import HttpResponse
 from django.template import Context, loader
 from django.http import HttpResponseRedirect
-from jobfind.models import Job,JobL
+from jobfind.models import Job,JobL,JobCompanyScore
 from django.db.models import Q
 import sys,traceback
 sys.path.append("/home/sin/wkspace/soft/python/pub/utility/")
@@ -44,6 +44,15 @@ def detail(request, poll_id):
         if j!=None: 
             jdict=model2dict(j)
             jdict['jobsCnt']=JobDbView.objects.count()
+            css="-1"
+            cs=None
+            try:
+                cs=JobCompanyScore.objects.get(coname=j.coname)
+            except Exception,ex:
+                print "company score not scan yet!"
+            if(cs!=None):
+                css=cs.score
+            jdict['compScore']=css
             res= "%s" %dict2json(jdict)
         return HttpResponse("%s" %res)
     except Exception,ex: 
@@ -166,7 +175,7 @@ class ViewLocalJobs():
         template = loader.get_template('jobfind/viewljobs_table.html')
         print request.POST
         local=request.POST.get('local')
-        jobs=JobLocalDbView.objects
+        jobs=JobLocalDbView.objects.order_by("-id")
         if len(local)>0:
             jobs=jobs.filter(local__contains=local)  #Lesson django orm:querry with sql like :colum__xxx
 

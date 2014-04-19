@@ -66,6 +66,7 @@
                     $("#jobdesc").html(job.jd.replace(/\n/g,"<br/>"));//use html() to show tags
                     $("#jstate").text(job.state)
                     $("#idjloc").text(job.local)
+                    $("#idCompScore").text(" score["+job.compScore+"]")
                     totalRcd=job.jobsCnt
                     endId=startId+totalRcd;
                     $("#idend").text(":"+endId)
@@ -182,7 +183,7 @@
         <p></p>
         <p></p>
         <table><tr><td id='jstate'></td><td id='job'></td><td id='idjloc'></td></tr></table>
-        <p id='coname'></p>
+        <table><tr><td id='coname'></td><td id='idCompScore'></td></tr></table>
         <p id='codesc'></p>
         <!--
         <p id='job'></p>
