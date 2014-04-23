@@ -117,11 +117,12 @@ class Job51Adder():
         print "setQuerryDict querryDict=%s" %querryDict
         self.mFilterKeys=querryDict.get("filterkeys").split(",")
         print "self.mFilterKeys type=%s l=%s" %(type(self.mFilterKeys),self.mFilterKeys)
-    def addJob(self,keyword,jobarea,issuedate,startpage=1,endpage=50):
-        keyword=urllib.quote(keyword.encode('utf-8'))
         strategyFactory=StrategyFactory(int(self.mQuerryDic['serverActionType']))
         self.mJobOprStrategy=strategyFactory.jobOpr
         self.mHtmlGetStrategy=strategyFactory.htmlGetor
+
+    def addJob(self,keyword,jobarea,issuedate,startpage=1,endpage=50):
+        keyword=urllib.quote(keyword.encode('utf-8'))
         self.init()
 
         loop=startpage
@@ -217,6 +218,11 @@ class Job51Adder():
                 scd="%s" %cd
                 scd=self.rmHtmlTag(scd)
 
+                update=s.findAll("table")[6].findAll("tr")[0].findAll("td")[1]
+                update="%s" %update
+                update=self.rmHtmlTag(update)
+                self.mHtmlGetStrategy.mExtralInfo['update']=update
+
                 self.mHtmlGetStrategy.mExtralInfo['jobDescribe']=sjd
                 self.mHtmlGetStrategy.mExtralInfo['companyDesc']=scd 
             if self.mHtmlGetStrategy.needScore(): 
@@ -243,7 +249,9 @@ class Job51Adder():
                 self.unprocessedUrls.append(BadUrl(url=joburl,reason="invalid job url,Can't get job description"))
             else:
                 self.unprocessedUrls.append(BadUrl(url=joburl,reason="Unknown reason"))
-
+    def getUpdate(self,jobDetailUrl):
+        self.getDescript(jobDetailUrl)
+        return self.mHtmlGetStrategy.mExtralInfo['update']
 
     def rmHtmlTag(self,html):
         html=html.replace("<br>","\n").replace("</br>","")
@@ -259,11 +267,11 @@ class Job51Adder():
         
 if __name__=="__main__":
     jobadder=Job51Adder()
-    qd={'filterkeys':'linux','keywordtype':'100'}
+    qd={'filterkeys':'linux','keywordtype':'100','serverActionType':55}
     jobadder.setQuerryDict(qd)
-    jobadder.addJob("linux","020000",'3',1,-1)
+    #jobadder.addJob("linux","020000",'3',1,-1)
     #jobadder.tst()
-    #jobadder.getDescript('http://search.51job.com/job/47191143,c.html') #job url
+    jobadder.getDescript('http://search.51job.com/job/51281684,c.html') #job url
     #jobadder.getDescript('http://search.51job.com/list/co,c,2245593,000000,10,1.html') #company url
     #jobadder.getDescript('http://search.51job.com/list/co,c,3289243,000000,10,1.html') #company url
     #getDescript('http://ac.51job.com/phpAD/adtrace.php?ID=15736875&JobID=56483257')

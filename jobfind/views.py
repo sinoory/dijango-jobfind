@@ -174,6 +174,8 @@ class ViewLocalJobs():
     def getPostResponse(self,request):
         template = loader.get_template('jobfind/viewljobs_table.html')
         print request.POST
+        if(request.POST.get('cmd')=="UPDATE_JOB"):
+            return self.updateJob(request)
         local=request.POST.get('local')
         jobs=JobLocalDbView.objects.order_by("-id")
         if len(local)>0:
@@ -191,6 +193,17 @@ class ViewLocalJobs():
 
         return HttpResponse(template.render(context))
 
+    def updateJob(self,request):
+        job=JobLocalDbView.objects.filter(Q(id=request.POST.get("id")))[0] #Lesson django,orm querry whith OR
+        qd={'filterkeys':'linux','keywordtype':'100','serverActionType':55}
+        jobAdder.setQuerryDict(qd)
+        update=jobAdder.getUpdate(job.jobu)
+        updateres="not_update"
+        if update!=job.udate:
+            job.udate=update
+            job.save()
+            updateres="updated"
+        return HttpResponse(json.dumps({"res":updateres,"newDate":update}))
         #jobs=JobLocalDbView.objects.filter(Q(state='watch')|Q(state='get')) #Lesson django,orm querry whith OR
         #return HttpResponse(json.dumps({"code":"post local"}))
   
