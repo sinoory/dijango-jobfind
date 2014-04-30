@@ -22,11 +22,12 @@ from jobdb import Job,JobDbOpr,JobCompScoreOpr
 import re
 
 class BadUrl():
-    def __init__(self,url,reason):
+    def __init__(self,url,reason,title=""):
         self.url=url
         self.reason=reason
+        self.urltitle=title
     def toStr(self):
-        return "BadUrl<%s,%s>" %(self.url,self.reason)
+        return "BadUrl<%s , %s , %s>" %(self.url,self.reason,self.urltitle)
 
     def __unicode__(self):
         return "BadUrl<%s , %s>" %(self,url,self.reason)
@@ -247,6 +248,8 @@ class Job51Adder():
             elif joburl.find("search.51job.com")==-1:
                 print ("Can't get job description from %s" %(joburl))
                 self.unprocessedUrls.append(BadUrl(url=joburl,reason="invalid job url,Can't get job description"))
+            elif s and s.title:
+                self.unprocessedUrls.append(BadUrl(url=joburl,reason="Unknown reason",title=s.title))
             else:
                 self.unprocessedUrls.append(BadUrl(url=joburl,reason="Unknown reason"))
     def getUpdate(self,jobDetailUrl):

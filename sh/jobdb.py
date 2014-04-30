@@ -55,8 +55,8 @@ class JobCompScoreOpr(JobOpr):
     def isOutData(self,job):
         oldscore=JobCompanyScore.objects.filter(coname=job.coname)[0].score
         newscore=self.mExtraInfoDict['score']
-        if(int(oldscore)<int(newscore)):
-            print "oldscore[%s]<newscore[%s],need update" %(oldscore,newscore)
+        if(int(oldscore) != int(newscore)):
+            print "oldscore[%s]!=newscore[%s],need update" %(oldscore,newscore)
             return True
         return False
         #j=JobCompanyScore.objects.filter(coname=job.coname).filter(score__lt=self.mExtraInfoDict['score'])
@@ -79,6 +79,20 @@ class JobDbOpr(JobOpr):
         #querry whether the job exist in the local db jobl
         j=Job.objects.filter(jobu=job.jobu)
         jl=JobL.objects.filter(jobu=job.jobu)
+        
+        tj=None
+        if len(j)>0:
+            tj=j[0]
+        if len(jl)>0:
+            tj=jl[0]
+        if not tj is None:
+            if tj.coname != job.coname or tj.job != job.job:
+                print "XXXXXXXXXXXXXXXXXXXXXXX"
+                print "The same job url=%s,but with different coname or jobname" %job.jobu
+                print "db job=%s" %tj
+                print "net jb=%s" %job
+                print "XXXXXXXXXXXXXXXXXXXXXXX"
+                exit()
         return len(j)>0 or len(jl)>0
     def add(self,job):
         if self.isJobExist(job):

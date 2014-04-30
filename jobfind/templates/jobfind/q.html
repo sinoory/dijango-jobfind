@@ -195,13 +195,9 @@
         }
         CmdScanHighScoreCmpanys.prototype.onSuccessRes=function(data){
             dbg("CmdScanHighScoreCmpanys onSuccessRes,isLoopScan="+this.isLoopScan)
-            if(!this.isLoopScan || this.mUserStoped){
-                dbg("CmdScanHighScoreCmpanys "+this.mStartTm+"====>"+(new Date()))
+            if(!this.isLoopScan || this.mUserStoped||!companyLoopQuerry("#idhistorykey",this.cmdName,this.mUserStoped)){
+                dbg("Cmd["+this.cmdName+"] "+this.mStartTm+"====>"+(new Date()))
             }
-            if(!this.isLoopScan){
-                return
-            }
-            companyLoopQuerry("#idhistorykey",this.cmdName,this.mUserStoped) 
         }
        //=============CmdShowHighScoreCmpanys==========
         function CmdShowHighScoreCmpanys(){
