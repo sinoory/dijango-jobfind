@@ -51,6 +51,7 @@
             this.mMustContainKeys=new Array()
             this.mUserStoped=false
             this.mStartTm=""
+            this.settingkey="Setting_"+this.cmdName
         }
         Cmd.prototype={
             showorhideElement:function(bshow){
@@ -62,6 +63,16 @@
                     return false
                 }
                 return true
+            },
+            getSettingkey:function(){
+                return "Setting_"+this.cmdName
+            },
+            saveSetting:function(){
+                var js={
+                   workArea:getJobArea(),
+                   publishday:$("#idpublishday").val()
+                }
+                localStorage[this.getSettingkey()]=JSON.stringify(js)
             },
             prepData:function(){
             },
@@ -85,6 +96,69 @@
             },
             onSuccessRes:function(data){
             },
+            isFinished:function(){
+                return this.mIsFinished
+            },
+        }
+        //=============CmdConbination==========
+        function CmdConbination(cmdArr){
+            this.cmdName="Cmd_conbination"
+            this.mCmdArr=cmdArr
+            this.mCmdIndex=0
+        }
+        CmdConbination.prototype={
+            showorhideElement:function(bshow){
+                return this.mCmdArr[mCmdIndex].showorhideElement(bshow)
+            },
+            isInputValid:function(){
+                return this.mCmdArr[mCmdIndex].isInputValid()
+            },
+            getSettingkey:function(){
+                return this.mCmdArr[mCmdIndex].getSettingkey()
+            },
+            saveSetting:function(){
+            },
+            prepData:function(){
+                return this.mCmdArr[mCmdIndex].prepData()
+            },
+            onStart:function(){
+                this.mStartTm=new Date()
+            },
+            getQuerryJson:function(){
+                return this.mCmdArr[mCmdIndex].getQuerryJson()
+            },
+            getHelpStr:function(){
+                return "UnImplement"
+            },
+            onSuccessRes:function(data){
+                if(this.mCmdArr[mCmdIndex].mUserStoped){
+                    dbg(this.mCmdArr[0].mStartTm+"======>"+(new Date()))
+                }else if(this.mCmdArr[mCmdIndex].onSuccessRes(data)){//current cmd still need run
+                }else{
+                    
+                }
+            },
+        }
+
+
+
+        //=====================================
+        function restoryUiFromSetting(settingJs){
+            var workArea=settingJs.workArea
+            var arryArea=new Array()
+            arryArea=workArea.split(",")
+            var publishday=settingJs.publishday
+            $("#idpublishday").val(publishday)
+            //$("input")[0].checked = true;
+            $("input[name='idJobArea']").each(function() {
+                var val=$(this).attr('value')
+                if($.inArray(val,arryArea)!=-1){
+                    this.checked=true  //Lesson set checked or not
+                }else{
+                    this.checked=false
+                }
+            })
+           
         }
         //=================CmdQuerry=============
         function CmdQuerry(){
@@ -154,7 +228,9 @@
         CmdQuerryHighScoreCmpanys.prototype.onSuccessRes=function(data){
             if(!companyLoopQuerry("#idselScoreCompanys",this.cmdName,this.mUserStoped)){
                 dbg("Cmd["+this.cmdName+"] "+this.mStartTm+"====>"+(new Date()))
+                return false
             }
+            return true
         }
         //==============CmdScanHighScoreCmpanys===========
         function CmdScanHighScoreCmpanys(){
@@ -197,7 +273,9 @@
             dbg("CmdScanHighScoreCmpanys onSuccessRes,isLoopScan="+this.isLoopScan)
             if(!this.isLoopScan || this.mUserStoped||!companyLoopQuerry("#idhistorykey",this.cmdName,this.mUserStoped)){
                 dbg("Cmd["+this.cmdName+"] "+this.mStartTm+"====>"+(new Date()))
+                return false
             }
+            return true
         }
        //=============CmdShowHighScoreCmpanys==========
         function CmdShowHighScoreCmpanys(){
@@ -214,6 +292,8 @@
                 $("#idselScoreCompanys").hide()
                 $("#idsearchkey").hide()
             }
+        }
+        CmdShowHighScoreCmpanys.prototype.saveSetting=function(){
         }
         CmdShowHighScoreCmpanys.prototype.onSuccessRes=function(data){
             initSel("#idselScoreCompanys",data.res)
@@ -247,6 +327,7 @@
             if(! curCmd.isInputValid()){
                 return
             }
+            curCmd.saveSetting()
             curCmd.prepData()
             var postdata=curCmd.getQuerryJson()
             if($("#idselKeytype").val()==2){//querry with full text
@@ -341,10 +422,12 @@
     
             //dbg($("#idselScoreCompanys").val().split(':')[0]
 
-            //c=new CmdQuerryHighScoreCmpanys()
+            c=new CmdQuerryHighScoreCmpanys()
             //c.showorhideElement(true)
-            var d=new Date()
-            dbg(d)
+            //c.saveSetting()
+            //dbg("c.cmdName="+c.cmdName+" c.settingkey="+c.getSettingkey())
+            dbg(c.getSettingkey()+"="+localStorage[c.getSettingkey()])
+            restoryUiFromSetting(JSON.parse(localStorage[c.getSettingkey()]))
 
         }
 
@@ -376,6 +459,8 @@
                 curCmd=new CmdQuerryHighScoreCmpanys()
             }
             curCmd.showorhideElement(true)
+            dbg(curCmd.getSettingkey()+"="+localStorage[curCmd.getSettingkey()])
+            restoryUiFromSetting(JSON.parse(localStorage[curCmd.getSettingkey()]))
         }
 
         </script>

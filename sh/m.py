@@ -143,7 +143,7 @@ class Job51Adder():
                 print "Exit,No job in page "+url
                 self.mFinishReason="REACH_END"
                 break;            
-            elif jobs==USER_STOPED:
+            elif jobs==USER_STOPED or self.userStopped:
                 print "user stopped,exit addJob"
                 self.mFinishReason="STOP"
                 break;
