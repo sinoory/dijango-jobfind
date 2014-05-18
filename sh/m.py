@@ -157,7 +157,10 @@ class Job51Adder():
         pagesearchurl=("http://search.51job.com/jobsearch/search_result.php?fromJs=1&jobarea="+jobarea+"&district=000000&funtype=0000&industrytype=00&issuedate="+issuedate+"&providesalary=99&keyword="+keyword+"&keywordtype="+self.mQuerryDic.get('keywordtype')+"&curr_page="+str(pageindex)+"&lang=c&stype=2&postchannel=0000&workyear=99&cotype=99&degreefrom=99&jobterm=01&lonlat=0%2C0&radius=-1&ord_field=0&list_type=0&fromType=14")
         reader=HtmlReader(pagesearchurl,retrycnt=5)
         reader.run()
-        soup=BeautifulSoup(reader.outdata)
+        #BeautifulSoup will try to get encode from page  <meta  content="text/html; charset=gb2312">
+        #here the data from HtmlReader is already utf8,not meta gb2312,so pass utf-8 to its construct to force encoding,
+        #otherwise the BeautifulSoup can't work
+        soup=BeautifulSoup(reader.outdata,fromEncoding="utf-8")
         print "process %s" %pagesearchurl
         #print soup.findAll("ul",{"class":"dict-basic-ul"})[0].li.strong.string 
         #find the table firest ,then find the job items
@@ -209,7 +212,7 @@ class Job51Adder():
         outdata=self.mHtmlGetStrategy.data()
         #print outdata
         try:
-            s=BeautifulSoup(outdata)
+            s=BeautifulSoup(outdata,fromEncoding='utf-8')
             if self.mHtmlGetStrategy.needJobCompDesc():
                 jd=s.findAll("td",{"class":"txt_4 wordBreakNormal job_detail "})[0]
                 sjd="%s" %jd
@@ -272,9 +275,9 @@ if __name__=="__main__":
     jobadder=Job51Adder()
     qd={'filterkeys':'linux','keywordtype':'100','serverActionType':55}
     jobadder.setQuerryDict(qd)
-    #jobadder.addJob("linux","020000",'3',1,-1)
+    jobadder.addJob("linux","020000",'3',1,1)
     #jobadder.tst()
-    jobadder.getDescript('http://search.51job.com/job/51281684,c.html') #job url
+    #jobadder.getDescript('http://search.51job.com/job/51281684,c.html') #job url
     #jobadder.getDescript('http://search.51job.com/list/co,c,2245593,000000,10,1.html') #company url
     #jobadder.getDescript('http://search.51job.com/list/co,c,3289243,000000,10,1.html') #company url
     #getDescript('http://ac.51job.com/phpAD/adtrace.php?ID=15736875&JobID=56483257')
