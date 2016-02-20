@@ -7,6 +7,14 @@
             color:#000000;
             text-decoration:underline;
         }
+        .clearfix:after {
+            content: ".";
+            display: block;
+            height: 0;
+            clear: both;
+            visibility: hidden;
+        }
+
         </style>
         <script language="javascript">
         var startId=0;
@@ -17,17 +25,19 @@
             $("#console").text(msg);
         }
         
+        PREV_KEYCODE=37
+        NEXT_KEYCODE=39
         function keyDown(e) { 
             var keycode = e.which; 
             var realkey = String.fromCharCode(e.which); 
             var t="keycode: " + keycode + " charcode: " + realkey;
             dbg(t);
-            if(keycode==37){ //prev
+            if(keycode==PREV_KEYCODE){ //prev
                 current-=1;
                 if(current<startId){current=startId}
                 $("#idcur").text(current);
                 showRcd(current);
-            }else if(keycode==39){//next
+            }else if(keycode==NEXT_KEYCODE){//next
                 current+=1;
                 if(current>endId){current=endId}
                 $("#idcur").text(current);
@@ -47,6 +57,12 @@
 
             //alert("keycode: " + keycode + " charcode: " + realkey); 
         } 
+        function shouldIngoreJob(job){
+            for(var i in mIgnoreKeys){
+                if(job.job.indexOf(mIgnoreKeys[i])>=0){
+                }
+            }
+        }
         function showRcd(id){
              var aj = $.ajax( { 
                 url:id,
@@ -119,7 +135,14 @@
             $("#idstart").text(startId+":")
             $("#idend").text(":"+endId)
             $("#idtextareacur").hide()
+            $("#idIgoreKeys").val(localStorage.ignoreKeys)
         });
+        function changeIngoreKeys(){
+            var keys=$("#idIgoreKeys").val()
+            dbg("changeIngoreKeys keys="+keys)
+            mIgnoreKeys=keys.split(" ")
+            localStorage.ignoreKeys=keys
+        }
         function test(){
             //dbg(unescape("{\u82e5\u9690\u82e5\u73b0}"))
             //dbg(unescape("\u5408\u80a5\u4e2d\u7ee7\u4fe1\u606f\u79d1\u6280\u6709\u9650\u516c\u53f8"))
@@ -176,21 +199,29 @@
         </table>
         <!-- http://jscolor.com/try.php#onchange  -->
         <input id='idcolorpicker' class='color'  onchange="changeBkColor(this.color)">
+        <input type='text' id='idIgoreKeys' onchange="changeIngoreKeys()">
         <!--
         <button onclick='test()'>test2</button>
         -->
         <p></p>
         <p></p>
         <p></p>
-        <table><tr><td id='jstate'></td><td id='job'></td><td id='idjloc'></td></tr></table>
-        <table><tr><td id='coname'></td><td id='idCompScore'></td></tr></table>
-        <p id='codesc'></p>
-        <!--
-        <p id='job'></p>
-        <p id='jstate'></p>
-        -->
-        <p id='jobdesc'></p>
-        <p id="console"></p>
-        <p id='content' ></p>
+            <div style="width:1300px;border:1px solid red;" class="clearfix">
+            <div id='idivJob' style="width:1100px;float:left;">
+                <table><tr><td id='jstate'></td><td id='job'></td><td id='idjloc'></td></tr></table>
+                <table><tr><td id='coname'></td><td id='idCompScore'></td></tr></table>
+                <p id='codesc'></p>
+                <!--
+                <p id='job'></p>
+                <p id='jstate'></p>
+                -->
+                <p id='jobdesc'></p>
+                <p id="console"></p>
+                <p id='content' ></p>
+            </div>
+            <div id='idivIgnoredJob' style="width:200px;float:left;border:1px;">
+                <p>ignored jobs tests asdf asdfa afas</p>
+            </div>
+        </div>
     </body>
 </html>
