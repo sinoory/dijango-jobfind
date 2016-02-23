@@ -7,9 +7,9 @@ from django.http import HttpResponseRedirect
 from jobfind.models import Job,JobL,JobCompanyScore
 from django.db.models import Q
 import sys,traceback
-sys.path.append("/home/sin/wkspace/soft/python/pub/utility/")
+sys.path.append(os.path.join(os.path.dirname(__file__),"../pypub/utility"))
 from uty import *
-sys.path.append("/home/sin/wkspace/webserver/django/mysite/sh")
+sys.path.append(os.path.join(os.path.dirname(__file__),"../sh"))
 from m import Job51Adder
 from jobdb import mergeTable,getCompanyList
 

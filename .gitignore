@@ -1,2 +1,4 @@
 Error.txt
 tst/
+*.pyc
+*.swp

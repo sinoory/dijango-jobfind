@@ -24,3 +24,9 @@ Using the URLconf defined in mysite.urls, Django tried these URL patterns, in th
 
 clear db:
 see mysite/mysite/settings.py for mysql config
+
+setup: django require version 1.6
+sudo pip install django==1.6
+sudo pip install south
+sudo apt-get install python-mysqldb
+sudo apt-get install python-qt4

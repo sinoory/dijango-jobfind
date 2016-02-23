@@ -1,8 +1,8 @@
 # -*- coding:utf-8 -*-
 #!/usr/bin/python
-import sys
-sys.path.append("/home/sin/wkspace/soft/python/pub/web/")
-sys.path.append("/home/sin/wkspace/soft/python/pub/utility/")
+import sys,os
+sys.path.append(os.path.join(os.path.dirname(__file__),"../pypub/utility"))
+sys.path.append(os.path.join(os.path.dirname(__file__),"../pypub/web"))
 from getPage import HtmlReader
 from QtPage import Render,WebkitRender
 from uty import *
