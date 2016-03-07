@@ -1,5 +1,9 @@
-python manage.py runserver
+
+#for first run to creat db
 python manage.py syncdb
+
+#main
+python manage.py runserver
 
 #can use ip to access webserver
 python manage.py runserver 0.0.0.0:8085

@@ -18,7 +18,8 @@ class AJob(models.Model):
     coname=models.CharField(max_length=100)
     courl=models.CharField(max_length=100)
     jd=models.TextField()
-    cd=models.CharField(max_length=100) #company simple describle
+    cd=models.TextField()
+    #cd=models.CharField(max_length=100) #company simple describle
     state=models.CharField(max_length=10) #null .get , filter ...
     udate=models.CharField(max_length=10)
     sendate=models.CharField(max_length=10)
