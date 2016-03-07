@@ -37,7 +37,7 @@
         } 
        
         var KEYWORDTYPE_SEARCH_WITH_FULL_TEXT=2
-        var KEYWORDTYPE_SEARCH_WITH_COMPANY_NAME=0
+        var KEYWORDTYPE_SEARCH_WITH_COMPANY_NAME=1
         var SEVER_ACTION_GET_JOBS_TO_DB=0
         var SEVER_ACTION_SCAN_COMPANY_SCORE_TO_DB=1
         var CMD_SEATCH_WITH_COMPANY_NAME=0
@@ -183,9 +183,6 @@
             this.mKeywordSearchType=KEYWORDTYPE_SEARCH_WITH_COMPANY_NAME
         }
         CmdQuerryFavorCmpanys.prototype=new Cmd()
-        CmdQuerryFavorCmpanys.prototype.prepData=function(){
-            this.mMustContainKeys=mHistoryOks.keysArr
-        }
         CmdQuerryFavorCmpanys.prototype.showorhideElement=function(bshow){
             if(bshow){
                 $("#idselCompanys").show()
@@ -198,6 +195,7 @@
         CmdQuerryFavorCmpanys.prototype.isInputValid=function(){return true}
         CmdQuerryFavorCmpanys.prototype.prepData=function(){
             $("#idsearchkey").val($("#idselCompanys").val())
+            this.mMustContainKeys=mHistoryOks.keysArr
         }
         CmdQuerryFavorCmpanys.prototype.onSuccessRes=function(data){
             if(!companyLoopQuerry("#idselCompanys",this.cmdName,this.mUserStoped)){
@@ -513,6 +511,7 @@ history<select id='idhistorykey' onchange="$('#idsearchkey').val($('#idhistoryke
 <option>华为技术
 <option>中兴通讯
 <option>腾讯计算机
+<option>百度
 <option>TCL
 <option>爱立信
 <option>小米科技
@@ -543,4 +542,7 @@ history<select id='idhistorykey' onchange="$('#idsearchkey').val($('#idhistoryke
 
 <br>
 <p id='console'></p>
+<p id='help'>
+选中以全文（职位信息，职位要求）｜｜公司名查询后，再在history中选择职位相关关键词来过滤公司相关职位。
+</p>
 </body></html>

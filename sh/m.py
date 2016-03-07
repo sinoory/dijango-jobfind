@@ -1,6 +1,6 @@
 # -*- coding:utf-8 -*-
 #!/usr/bin/python
-import sys,os,traceback
+import sys,os,traceback,time
 sys.path.append(os.path.join(os.path.dirname(__file__),"../pypub/utility"))
 sys.path.append(os.path.join(os.path.dirname(__file__),"../pypub/web"))
 from webLogin import LoginBroser
@@ -39,9 +39,11 @@ UNDEFINDED=-2
 class JobStrategy():
     def isJobSuilt(self,jobstr,keysDict):
         for k in keysDict:
-            if jobstr.find(k.upper()) != -1:
-                return True
-        return False
+            p=jobstr.find(k.upper())
+            if p != -1:
+                #print "isJobSuilt hitKey="+k
+                return True,k,p
+        return False,0,0
 
 class HtmlGetStrategy():
     mExtralInfo={'jobDescribe':'','companyDesc':''}
@@ -190,6 +192,8 @@ class Job51Adder():
             company=j.findAll("span",{"class":"t2"})[0].findAll("a")[0].get("title")
             companyUrl=j.findAll("span",{"class":"t2"})[0].findAll("a")[0].get("href")
             local=j.findAll("span",{"class":"t3"})[0].get_text() #.encode('utf-8')
+            salary=j.findAll("span",{"class":"t4"})[0].get_text() #.encode('utf-8')
+            jobname+=salary;
             ud=j.findAll("span",{"class":"t5"})[0].get_text()
             self.mHtmlGetStrategy.mExtralInfo['jobDetailPageUrl']=jobDetailPageUrl
             self.mHtmlGetStrategy.mExtralInfo['companyUrl']=companyUrl
@@ -204,12 +208,21 @@ class Job51Adder():
             if not self.mHtmlGetStrategy.isDescValid():
                 print "xxxxinvalid job descxxxxxx"
                 continue
-            job=Job(job=jobname,jobu=jobDetailPageUrl,local=local,coname=company,courl=companyUrl,jd=jd,cd=cd,udate=ud)
             if self.mHtmlGetStrategy.needJobCompDesc():
-                jobstring="%s%s" %(jobname,jd.decode("utf-8")) #TODO why type(jd)=str but type(jobname)=u?
-                if not self.mJobStrategy.isJobSuilt(jobstring.upper(),self.mFilterKeys):
+                #jobstring="%s%s" %(jobname,jd.decode("utf-8")) #
+                jobstring="%s" %(jd.decode("utf-8")) #TODO why type(jd)=str but type(jobname)=u?
+                jd=jobstring
+                #isjobok,k,p=self.mJobStrategy.isJobSuilt(jobstring.upper(),self.mFilterKeys)
+                isjobok,k,p=self.mJobStrategy.isJobSuilt(jd.upper(),self.mFilterKeys)
+                if not isjobok:
                     print "Ignore Job<%s,%s> NOT contain keyword %s" %(jobname,company,self.mFilterKeys)
                     continue
+                else:
+                    #set bold for keyword in job desc
+                    jd=jd[:p]+"<font color='red'>"+k+"</font>"+jd[p+len(k):]
+                    #print "get a job %s,%s" %(jobDetailPageUrl,jd)
+                    #time.sleep(10)
+            job=Job(job=jobname,jobu=jobDetailPageUrl,local=local,coname=company,courl=companyUrl,jd=jd,cd=cd,udate=ud)
             if not jbo.isJobExist(job):
                 jbo.add(job)
             elif jbo.isOutData(job) :
