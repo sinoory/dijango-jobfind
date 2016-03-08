@@ -158,9 +158,7 @@ class Job51Adder():
             print bu.toStr()
     def addOnePageJob(self,keyword,jobarea,issuedate,pageindex):
         jbo = self.mJobOprStrategy #JobCompScoreOpr() #JobDbOpr()
-        pagesearchurl=("http://search.51job.com/jobsearch/search_result.php?fromJs=1&jobarea="+jobarea+"&district=000000&funtype=0000&industrytype=00&issuedate="+issuedate+"&providesalary=99&keyword="+keyword+"&keywordtype="+self.mQuerryDic.get('keywordtype')+"&curr_page="+str(pageindex)+"&lang=c&stype=2&postchannel=0000&workyear=99&cotype=99&degreefrom=99&jobterm=01&lonlat=0%2C0&radius=-1&ord_field=0&list_type=0&fromType=14")
-        pagesearchurl="http://search.51job.com/jobsearch/search_result.php?fromJs=1&jobarea="+jobarea+"&district=000000&funtype=0000&industrytype=00&issuedate="+issuedate+"&providesalary=99&keyword="+keyword+"&keywordtype="+self.mQuerryDic.get('keywordtype')+"&curr_page="+str(pageindex)+"&lang=c&stype=2&postchannel=0000&workyear=99&cotype=99&degreefrom=99&jobterm=01&companysize=99&lonlat=0%2C0&radius=-1&ord_field=0&list_type=0&fromType=14&dibiaoid=0&confirmdate=9"
-        #pagesearchurl="http://search.51job.com/jobsearch/search_result.php?fromJs=1&jobarea=020000%2C00&district=000000&funtype=0000&industrytype=00&issuedate=3&providesalary=99&keyword="+keyword+"&keywordtype="+self.mQuerryDic.get('keywordtype')+"&curr_page="+str(pageindex)+"&lang=c&stype=2&postchannel=0000&workyear=99&cotype=99&degreefrom=99&jobterm=01&companysize=99&lonlat=0%2C0&radius=-1&ord_field=0&list_type=0&fromType=14&dibiaoid=0&confirmdate=9"
+        pagesearchurl="http://search.51job.com/jobsearch/search_result.php?fromJs=1&jobarea="+jobarea+"&district=000000&funtype=0000&industrytype=00&issuedate="+issuedate+"&providesalary=99&keyword="+keyword+"&keywordtype="+self.mQuerryDic.get('keywordtype')+"&curr_page="+str(pageindex)+"&providesalary="+self.mQuerryDic.get("salaryarea")+"&lang=c&stype=2&postchannel=0000&workyear=99&cotype=99&degreefrom=99&jobterm=01&companysize=99&lonlat=0%2C0&radius=-1&ord_field=0&list_type=0&fromType=14&dibiaoid=0&confirmdate=9"
         ck="guid=14559615973991260064; ps=us%3DATgGbFAwBS1SNQ5mAHtSZ1FiUX5VYVIzBjBWeFphUWUMMVc5A2gBMVc3WzEAZFdnU2hQYlFgV35QGlBxCHQOSAFT%26%7C%26nv_3%3D; adv=adsnew%3D0%26%7C%26adsresume%3D1%26%7C%26adsfrom%3Dhttp%253A%252F%252Fbzclk.baidu.com%252Fadrc.php%253Ft%253D0fKL00c00f7A79n0jn-w00uiAsjtPT9y00000r6zeHY00000TD0ttK.THYdnyGEm6K85yF9pywd0Znqmvn3uWFhrHcsnj04nyRkP0Kd5HNKwHbknH0srRPafb7Krjw7P1TYwHDLrjN7rRcYPHwD0ADqI1YhUyPGujYzPH6zrjfYPHc1FMKzUvwGujYkPBuEThbqniu1IyFEThbqFMKzpHYz0ARqpZwYTjCEQLwzmyP-QWRkphqBQhPEUiqYTh7Wui4spZ0Omyw1UMNV5HT3rHc1nzu9pM0qmR9inAPDULunnvf1uZbYnRdgTZuupHNJmWcsI-0zyM-BnW04yydAT7GcNMI-u1YqFh_qnARkPHcYPjFbrAFWrHRsuHR4PhFWPjmkryPhrHKhuhc0mLFW5HD1PHfz%2526tpl%253Dtpl_10085_12986_1%2526l%253D1038955240%2526ie%253DUTF-8%2526f%253D8%2526tn%253Dbaidu%2526wd%253D51job%26%7C%26adsnum%3D789233; guide=1; nolife=fromdomain%3D; search=jobarea%7E%60020000%7C%21ord_field%7E%600%7C%21list_type%7E%600%7C%21recentSearch0%7E%602%A1%FB%A1%FA020000%2C00%A1%FB%A1%FA000000%A1%FB%A1%FA0000%A1%FB%A1%FA00%A1%FB%A1%FA3%A1%FB%A1%FA99%A1%FB%A1%FA99%A1%FB%A1%FA99%A1%FB%A1%FA99%A1%FB%A1%FA01%A1%FB%A1%FA99%A1%FB%A1%FAlinux%A1%FB%A1%FA0%A1%FB%A1%FA%A1%FB%A1%FA-1%A1%FB%A1%FA1456818574%A1%FB%A1%FA0%A1%FB%A1%FA%7C%21"
 
         lb=LoginBroser()
@@ -193,7 +191,6 @@ class Job51Adder():
             companyUrl=j.findAll("span",{"class":"t2"})[0].findAll("a")[0].get("href")
             local=j.findAll("span",{"class":"t3"})[0].get_text() #.encode('utf-8')
             salary=j.findAll("span",{"class":"t4"})[0].get_text() #.encode('utf-8')
-            jobname+=salary;
             ud=j.findAll("span",{"class":"t5"})[0].get_text()
             self.mHtmlGetStrategy.mExtralInfo['jobDetailPageUrl']=jobDetailPageUrl
             self.mHtmlGetStrategy.mExtralInfo['companyUrl']=companyUrl
@@ -222,7 +219,7 @@ class Job51Adder():
                     jd=jd[:p]+"<font color='red'>"+k+"</font>"+jd[p+len(k):]
                     #print "get a job %s,%s" %(jobDetailPageUrl,jd)
                     #time.sleep(10)
-            job=Job(job=jobname,jobu=jobDetailPageUrl,local=local,coname=company,courl=companyUrl,jd=jd,cd=cd,udate=ud)
+            job=Job(job=jobname,jobu=jobDetailPageUrl,local=local,coname=company,courl=companyUrl,jd=jd,cd=cd,udate=ud,salary=salary)
             if not jbo.isJobExist(job):
                 jbo.add(job)
             elif jbo.isOutData(job) :

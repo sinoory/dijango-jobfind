@@ -14,6 +14,7 @@ class AJob(models.Model):
     site=models.CharField(max_length=20) #51job,zhlian,...
     job=models.CharField(max_length=100)
     jobu=models.CharField(max_length=100)
+    salary=models.CharField(max_length=50)
     local=models.CharField(max_length=20)
     coname=models.CharField(max_length=100)
     courl=models.CharField(max_length=100)
