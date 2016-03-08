@@ -250,6 +250,11 @@ class Job51Adder():
                 scd="%s" %cd
                 scd=self.rmHtmlTag(scd)
 
+                cdtype=s.findAll("p",{"class":"msg ltype"})[0].get_text() #return unicode
+                cdtype=cdtype.encode("utf8") #unicode to str type , as sjd is str type
+                cdtype=cdtype.replace("\t","").replace(" ","")
+                sjd=cdtype+"\n"+sjd
+                #print sjd
 
                 #update=s.findAll("table")[6].findAll("tr")[0].findAll("td")[1]
                 #update="%s" %update
@@ -304,9 +309,9 @@ if __name__=="__main__":
     jobadder=Job51Adder()
     qd={'filterkeys':'android','keywordtype':'100','serverActionType':55}
     jobadder.setQuerryDict(qd)
-    jobadder.addJob("android","020000",'1',3,3)
+    #jobadder.addJob("android","020000",'1',3,3)
     #jobadder.tst()
-    #jobadder.getDescript('http://jobs.51job.com/shanghai-pdxq/72070349.html?s=0') #job url
+    jobadder.getDescript('http://jobs.51job.com/shanghai-ptq/74316976.html?s=0') #job url
     #jobadder.getDescript('http://search.51job.com/list/co,c,2245593,000000,10,1.html') #company url
     #jobadder.getDescript('http://search.51job.com/list/co,c,3289243,000000,10,1.html') #company url
     #getDescript('http://ac.51job.com/phpAD/adtrace.php?ID=15736875&JobID=56483257')
