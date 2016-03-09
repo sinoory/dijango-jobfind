@@ -24,11 +24,16 @@
         function dbg(msg){
             $("#console").text(msg);
         }
-        
+       
+        function emulateKeyDown(keycode){
+            keyDown({which:lastArrowKey});
+        }
         PREV_KEYCODE=37
         NEXT_KEYCODE=39
+        var lastArrowKey=NEXT_KEYCODE;
         function keyDown(e) { 
             var keycode = e.which; 
+            lastArrowKey=keycode;
             var realkey = String.fromCharCode(e.which); 
             var t="keycode: " + keycode + " charcode: " + realkey;
             dbg(t);
@@ -63,6 +68,15 @@
                 }
             }
         }
+        function isJobOk(job){
+            var ignoresalaryArray=$("#idfiltersalary").val().split(",");
+            for(i in ignoresalaryArray){
+                if(job.salary==ignoresalaryArray[i]){
+                    return false;
+                }
+            }
+            return true;
+        }
         function showRcd(id){
              var aj = $.ajax( { 
                 url:id,
@@ -77,6 +91,10 @@
                     //Lesson:json: use eval convert string to json object,and  also change unicaode(\ue342 ...) to utf8
                     job=eval ("(" + data + ")"); 
                     $("#idsalary").html(job.salary);
+                    if(!isJobOk(job)){
+                        emulateKeyDown();
+                        return;
+                    }
                     $("#coname").html("<a href='"+job.courl+"' target='_blank' >"+job.coname+"<a/>");
                     $("#codesc").text(job.cd.replace(/\n/g,"    "));
                     $("#job").html("<a href='"+job.jobu+"' target='_blank' >"+job.job+"<a/>");
@@ -201,6 +219,9 @@
         <!-- http://jscolor.com/try.php#onchange  -->
         <input id='idcolorpicker' class='color'  onchange="changeBkColor(this.color)">
         <input type='text' id='idIgoreKeys' onchange="changeIngoreKeys()">
+        薪资过滤
+        <input type='text' id='idfiltersalary' value="15000-19999/月" ></input>
+
         <!--
         <button onclick='test()'>test2</button>
         -->
@@ -224,6 +245,7 @@
                     n:set null ; w:set watch status ; g:set get status<br><br>
                     after process,click submit button to submit status to local db<br>
                     <b>note</b>:that will save the current viewing jobs to local db;
+                    <br>薪资过滤多个时，使用,分隔。
                 </p>
                 <p id="console"></p>
                 <p id='content' ></p>
