@@ -76,7 +76,8 @@
                     //$("#content").text(unescape(data));
                     //Lesson:json: use eval convert string to json object,and  also change unicaode(\ue342 ...) to utf8
                     job=eval ("(" + data + ")"); 
-                    $("#coname").html("<a href='"+job.courl+"' target='_blank' >"+job.salary+"_"+job.coname+"<a/>");
+                    $("#idsalary").html(job.salary);
+                    $("#coname").html("<a href='"+job.courl+"' target='_blank' >"+job.coname+"<a/>");
                     $("#codesc").text(job.cd.replace(/\n/g,"    "));
                     $("#job").html("<a href='"+job.jobu+"' target='_blank' >"+job.job+"<a/>");
                     $("#jobdesc").html(job.jd.replace(/\n/g,"<br/>"));//use html() to show tags
@@ -210,6 +211,7 @@
             <div id='idivJob' style="width:80%;float:left;">
                 <table><tr><td id='jstate'></td><td id='job'></td><td id='idjloc'></td></tr></table>
                 <table><tr><td id='coname'></td><td id='idCompScore'></td></tr></table>
+                <table><tr><td id='idsalary'></td><td id='idundef'></td></tr></table>
                 <p id='jobdesc'></p>
                 <p id='codesc'></p>
                 <!--
