@@ -3,3 +3,4 @@ tst/
 *.pyc
 *.swp
 pypub
+*.sw*

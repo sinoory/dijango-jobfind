@@ -28,7 +28,11 @@
                 <td>{{ job.local }}</td>  
                 <td>{{ job.state }}</td>  
                 <td>{{ job.udate }}</td>  
-                <td>{{ job.sendate }}</td>
+                {% if job.sendate %}
+                <td><button onclick="sendresume({{job.id}})">{{ job.sendate }}</button></td>
+                {% else %}
+                <td><button onclick="sendresume({{job.id}})">send</button></td>
+                {% endif %}
                 <td>{{ job.sendcnt }}</td>
             </tr>
             {% endfor %}
