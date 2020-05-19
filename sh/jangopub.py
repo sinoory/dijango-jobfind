@@ -10,7 +10,7 @@ def ormsettingconfig():
     settings.configure( DATABASES = { #Lession : use ORM seprately,must config before import model
         'default': {
             'ENGINE': 'django.db.backends.mysql',
-            'NAME': 'db_tst_dj',
+            'NAME': 'job51db',
             'USER': 'root',
             'PASSWORD': 'r',
             'HOST': '',

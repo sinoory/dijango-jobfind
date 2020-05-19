@@ -3,8 +3,8 @@
 from django.conf import settings
 from django.utils import simplejson
 import sys,os
-sys.path.append("/home/sin/wkspace/webserver/django/mysite/")
-sys.path.append("/home/sin/wkspace/soft/python/pub/utility/")
+sys.path.append(os.path.join(os.path.dirname(__file__),"../"))
+sys.path.append(os.path.join(os.path.dirname(__file__),"../pypub/utility"))
 
 from jangopub import ormsettingconfig
 
@@ -20,10 +20,10 @@ def mergeTable():
     keys=modelKeys(j)
     keys.remove('id') #avoid insert error of duplicate primary key
     sqlkeys= "%s" %(",".join(keys))
-    cmd="""mysql -uroot --password=r -D db_tst_dj -e "insert into jobfind_jobl("""+sqlkeys+""") select """+sqlkeys+"""  from jobfind_job" """
+    cmd="""mysql -uroot --password=r -D job51db -e "insert into jobfind_jobl("""+sqlkeys+""") select """+sqlkeys+"""  from jobfind_job" """
     print cmd
     os.system(cmd)
-    cmd=""" mysql -uroot --password=r -D db_tst_dj -e " delete from jobfind_job " """
+    cmd=""" mysql -uroot --password=r -D job51db -e " delete from jobfind_job " """
     os.system(cmd)
 
 class JobOpr():

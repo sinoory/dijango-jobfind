@@ -61,9 +61,9 @@ WSGI_APPLICATION = 'mysite.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'db_tst_dj',
+        'NAME': 'job51db',
         'USER': 'root',
-        'PASSWORD': 'r',
+        'PASSWORD': 'sinsql',
         'HOST': '',
         'CHARSET':'utf-8',
     }

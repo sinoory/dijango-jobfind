@@ -169,7 +169,7 @@ class Job51Adder():
         #BeautifulSoup will try to get encode from page  <meta  content="text/html; charset=gb2312">
         #here the data from HtmlReader is already utf8,not meta gb2312,so pass utf-8 to its construct to force encoding,
         #otherwise the BeautifulSoup can't work
-        soup=BeautifulSoup(reader.outdata,fromEncoding="utf-8")
+        soup=BeautifulSoup(reader.outdata,fromEncoding="gbk")
         print "process %s" %pagesearchurl
         #print soup.findAll("ul",{"class":"dict-basic-ul"})[0].li.strong.string 
         #find the table firest ,then find the job items
@@ -220,6 +220,7 @@ class Job51Adder():
                     #print "get a job %s,%s" %(jobDetailPageUrl,jd)
                     #time.sleep(10)
             job=Job(job=jobname,jobu=jobDetailPageUrl,local=local,coname=company,courl=companyUrl,jd=jd,cd=cd,udate=ud,salary=salary)
+            print("job=",job)
             if not jbo.isJobExist(job):
                 jbo.add(job)
             elif jbo.isOutData(job) :
@@ -236,7 +237,8 @@ class Job51Adder():
         outdata=self.mHtmlGetStrategy.data()
         #print outdata
         try:
-            s=BeautifulSoup(outdata,fromEncoding='utf-8')
+            #getDescript should print the right chinese content with the right fromEncoding
+            s=BeautifulSoup(outdata,fromEncoding='gbk')
             if self.mHtmlGetStrategy.needJobCompDesc():
                 jd=s.findAll("div",{"class":"bmsg job_msg inbox"})[0]
                 sjd="%s" %jd
@@ -260,6 +262,7 @@ class Job51Adder():
 
                 self.mHtmlGetStrategy.mExtralInfo['jobDescribe']=sjd
                 self.mHtmlGetStrategy.mExtralInfo['companyDesc']=scd 
+                print(sjd)
             if self.mHtmlGetStrategy.needScore(): 
                 self.mHtmlGetStrategy.mExtralInfo['score']=-1
                 score=s.findAll('a',{"id":"company_url"})[0].get_text().strip()[4:][:-1]
@@ -308,7 +311,8 @@ if __name__=="__main__":
     jobadder.setQuerryDict(qd)
     #jobadder.addJob("android","020000",'1',3,3)
     #jobadder.tst()
-    jobadder.getDescript('http://jobs.51job.com/shanghai-ptq/74316976.html?s=0') #job url
+    jobadder.getDescript("https://jobs.51job.com/shanghai/116403419.html?s=01&t=0")
+    #jobadder.getDescript('http://jobs.51job.com/shanghai-ptq/74316976.html?s=0') #job url
     #jobadder.getDescript('http://search.51job.com/list/co,c,2245593,000000,10,1.html') #company url
     #jobadder.getDescript('http://search.51job.com/list/co,c,3289243,000000,10,1.html') #company url
     #getDescript('http://ac.51job.com/phpAD/adtrace.php?ID=15736875&JobID=56483257')
