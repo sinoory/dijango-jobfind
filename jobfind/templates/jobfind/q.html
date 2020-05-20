@@ -333,14 +333,14 @@
             if($("#idselKeytype").val()==2){//querry with full text
                 mHistoryOks.addKey(postdata.searchkey)
             }
-            dbg("loading...")
+            dbg(Date()+" loading...")
             var aj = $.ajax( { 
                 type:'post',
                 cache:'false',
                 data:postdata,
                 success:function(data){
 		            data = JSON.parse(data);
-                    dbg("querry post res="+data.code)
+                    dbg(Date()+" querry post res="+data.code)
                     curCmd.onSuccessRes(data)
                 },
                 error:function(){

@@ -28,6 +28,12 @@
         function emulateKeyDown(keycode){
             keyDown({which:lastArrowKey});
         }
+        function nextjob(){
+            keyDown({"which":NEXT_KEYCODE});
+        }
+        function prevjob(){
+            keyDown({"which":PREV_KEYCODE});
+        }
         PREV_KEYCODE=37
         NEXT_KEYCODE=39
         var lastArrowKey=NEXT_KEYCODE;
@@ -155,6 +161,8 @@
             $("#idend").text(":"+endId)
             $("#idtextareacur").hide()
             $("#idIgoreKeys").val(localStorage.ignoreKeys)
+            //nextjob();
+            //showRcd(1)
         });
         function changeIngoreKeys(){
             var keys=$("#idIgoreKeys").val()
@@ -221,6 +229,8 @@
         <input type='text' id='idIgoreKeys' onchange="changeIngoreKeys()">
         薪资过滤
         <input type='text' id='idfiltersalary' value="15000-19999/月" ></input>
+        <button onclick='prevjob()'>prevjob</button>
+        <button onclick='nextjob()'>nextjob</button>
 
         <!--
         <button onclick='test()'>test2</button>
@@ -229,12 +239,11 @@
         <p></p>
         <p></p>
             <div style="width:100%;border:1px solid red;" class="clearfix">
-            <div id='idivJob' style="width:80%;float:left;">
+            <div id='idivJob' style="width:60%;float:left;">
                 <table><tr><td id='jstate'></td><td id='job'></td><td id='idjloc'></td></tr></table>
                 <table><tr><td id='coname'></td><td id='idCompScore'></td></tr></table>
                 <table><tr><td id='idsalary'></td><td id='idundef'></td></tr></table>
                 <p id='jobdesc'></p>
-                <p id='codesc'></p>
                 <!--
                 <p id='job'></p>
                 <p id='jstate'></p>
@@ -250,8 +259,9 @@
                 <p id="console"></p>
                 <p id='content' ></p>
             </div>
-            <div id='idivIgnoredJob' style="width:20%;float:left;border:1px;">
-                <p>ignored jobs tests asdf asdfa afas</p>
+            <div id='idivIgnoredJob' style="width:40%;float:left;border:1px;">
+                <p id='codesc'></p>
+                <p>ignored jobs</p>
             </div>
         </div>
     </body>

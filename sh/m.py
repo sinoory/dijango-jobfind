@@ -220,7 +220,6 @@ class Job51Adder():
                     #print "get a job %s,%s" %(jobDetailPageUrl,jd)
                     #time.sleep(10)
             job=Job(job=jobname,jobu=jobDetailPageUrl,local=local,coname=company,courl=companyUrl,jd=jd,cd=cd,udate=ud,salary=salary)
-            print("job=",job)
             if not jbo.isJobExist(job):
                 jbo.add(job)
             elif jbo.isOutData(job) :
@@ -262,7 +261,6 @@ class Job51Adder():
 
                 self.mHtmlGetStrategy.mExtralInfo['jobDescribe']=sjd
                 self.mHtmlGetStrategy.mExtralInfo['companyDesc']=scd 
-                print(sjd)
             if self.mHtmlGetStrategy.needScore(): 
                 self.mHtmlGetStrategy.mExtralInfo['score']=-1
                 score=s.findAll('a',{"id":"company_url"})[0].get_text().strip()[4:][:-1]
