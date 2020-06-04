@@ -1,0 +1,145 @@
+<html>
+    <head>
+        <script type="text/javascript" src="../../../static/js/jquery-1.10.1.js"></script>
+        <script language="javascript">
+        var startId=0;
+        var totalRcd=0;
+        var current=0;
+        var endId=0
+        function dbg(msg){
+            $("#console").html(msg);
+        }
+        function login51(){
+            postdata={"uname":$("#iduser").val(),
+                "pswd":$("#idpswd").val(),
+                "vc":$("#idvc").val(),
+                "type":"login"
+            }
+            var aj = $.ajax( { 
+                type:'post',
+                cache:'false',
+                data:postdata,
+                success:function(data){
+                    dbg("stop() post res="+data)
+                    data = JSON.parse(data);
+                        //$("#coname").text(job.coname);
+                },
+                error:function(){
+                    dbg("stop error");
+                },
+
+            }); 
+
+        }
+        function updateImg(){
+            postdata={"uname":$("#iduser").val(),
+                "type":"updateImg"
+            }
+            var aj = $.ajax( { 
+                type:'post',
+                cache:'false',
+                data:postdata,
+                success:function(data){
+                    data = JSON.parse(data);
+                    dbg("updateImg post res="+data.src)
+                    $("#idimgvc").attr("src",data.src);
+                },
+                error:function(){
+                    dbg("stop error");
+                },
+            }); 
+
+        }
+
+        $(document).ready(function(){
+            loged={{loged}}; //template variables
+            vcurl="{{vcurl}}";
+            vcurl=vcurl.replace(/&amp;/g, "&")
+            //vcurl=("{{vcurl}}");
+            $("#idloged").text(""+loged+" "+vcurl)
+            $("#idimgvc").attr("src",vcurl)
+        });
+        function updatecooke(){
+            if ($("#idcook")[0].style.display == "none" ){
+                $("#idcook")[0].style.display = "block";
+                return
+            }
+            postdata={"cookie":$("#idcook").val(),
+                "type":"updateCookie"
+            }
+            var aj = $.ajax( { 
+                type:'post',
+                cache:'false',
+                data:postdata,
+                success:function(data){
+                    dbg("updateCookie post res="+data)
+                    data = JSON.parse(data);
+                },
+                error:function(){
+                    dbg(" error");
+                },
+            }); 
+
+        }
+
+        function getRecentCmpanys(){
+            dbg("")
+            postdata={
+                "num":$("#iduser").val() | 5,
+                "type":"getRecentCmpanys"
+            }
+            var aj = $.ajax( { 
+                type:'post',
+                cache:'false',
+                data:postdata,
+                success:function(data){
+                    dbg("updateCookie post res="+data)
+                    console.log(data)
+                    data = JSON.parse(data);
+                    name = data["hs"][0]["name"]
+                    str = ""
+                    console.log("len="+(data["hs"].length));
+                    for(var i=0;i<data["hs"].length;i++){
+                        cname = data["hs"][i]["name"]
+                        ctime = data["hs"][i]["time"]
+                        curl=data["hs"][i]["url"]
+
+                        str="<br><a href='"+curl+"' target='_blank'>"+ctime+" "+cname+"</a>"+str
+                    }
+                    dbg(str)
+                },
+                error:function(){
+                    dbg(" error");
+                },
+            }); 
+
+        }
+
+        </script>
+
+    </head>
+    
+    <body>
+
+        <div>
+            <span>username</span>
+            <input type='text' id='iduser' ></input>
+            <span>password</span>
+            <input type='text' id='idpswd' ></input>
+            <br>
+            <span>verifycode</span>
+            <input type='text' id='idvc'></input>
+            <img id="idimgvc" onclick="updateImg()" ></img>
+            <span id="idloged">no</span>
+            <br>
+            <button onclick='login51()'>login51</button>
+            <br>
+            <textarea type='text' id='idcook' style="width:60%;height:20%;display:none"></textarea>
+            <button onclick='updatecooke()'>upload cookie</button>
+            <button onclick='getRecentCmpanys()'>getRecentCmpanys</button>
+            
+        </div>
+        <p id="console">click upload cookie to copy/paste cookie to server, so server can operate you account</p>
+
+    </body>
+</html>
