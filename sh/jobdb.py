@@ -20,10 +20,10 @@ def mergeTable():
     keys=modelKeys(j)
     keys.remove('id') #avoid insert error of duplicate primary key
     sqlkeys= "%s" %(",".join(keys))
-    cmd="""mysql -uroot --password=r -D job51db -e "insert into jobfind_jobl("""+sqlkeys+""") select """+sqlkeys+"""  from jobfind_job" """
+    cmd="""mysql -uroot --password=sinsql -D job51db -e "insert into jobfind_jobl("""+sqlkeys+""") select """+sqlkeys+"""  from jobfind_job" """
     print cmd
     os.system(cmd)
-    cmd=""" mysql -uroot --password=r -D job51db -e " delete from jobfind_job " """
+    cmd=""" mysql -uroot --password=sinsql -D job51db -e " delete from jobfind_job " """
     os.system(cmd)
 
 class JobOpr():

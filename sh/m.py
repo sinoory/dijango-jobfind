@@ -238,6 +238,7 @@ class Job51Adder():
         try:
             #getDescript should print the right chinese content with the right fromEncoding
             s=BeautifulSoup(outdata,fromEncoding='gbk')
+            #s=BeautifulSoup(outdata,features="html5lib")
             if self.mHtmlGetStrategy.needJobCompDesc():
                 jd=s.findAll("div",{"class":"bmsg job_msg inbox"})[0]
                 sjd="%s" %jd
@@ -253,11 +254,10 @@ class Job51Adder():
                 cdtype=cdtype.replace("\t","").replace(" ","")
                 sjd=cdtype+"\n"+sjd
                 #print sjd
-
-                #update=s.findAll("table")[6].findAll("tr")[0].findAll("td")[1]
-                #update="%s" %update
-                #update=self.rmHtmlTag(update)
-                #self.mHtmlGetStrategy.mExtralInfo['update']=update
+                
+                update_i = cdtype.find("发布")
+                update=cdtype[update_i-5:update_i]
+                self.mHtmlGetStrategy.mExtralInfo['update']=update
 
                 self.mHtmlGetStrategy.mExtralInfo['jobDescribe']=sjd
                 self.mHtmlGetStrategy.mExtralInfo['companyDesc']=scd 
@@ -270,6 +270,9 @@ class Job51Adder():
             #print "%s" %outdata
             err= "Exception ex=%s in getDescript(%s),saved data in Error.txt" %(ex,joburl)
             print err
+            if outdata==None :
+                self.mHtmlGetStrategy.mExtralInfo['update']="expired"
+                return
             saveFile("%s\n" %(err),"Error.txt",'a')
             #saveFile("%s" %(outdata),"Error.txt",'a')
             #exit() 
