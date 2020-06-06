@@ -311,6 +311,8 @@ class ViewLocalJobs():
         print request.POST
         if(request.POST.get('cmd')=="UPDATE_JOB"):
             return self.updateJob(request)
+        if(request.POST.get('cmd')=="UPDATE_SENDDATA"):
+            return self.updateSendDate(request)
         local=request.POST.get('local')
         jobs=JobLocalDbView.objects.order_by("coname")
         if len(local)>0:
@@ -327,6 +329,13 @@ class ViewLocalJobs():
                     })
 
         return HttpResponse(template.render(context))
+
+    def updateSendDate(self,request):
+        job=JobLocalDbView.objects.filter(Q(id=request.POST.get("id")))[0]
+        job.sendate=request.POST['sendate']
+        job.sendcnt+=1
+        job.save()
+        return HttpResponse(json.dumps({"res":1,"sendcnt":job.sendcnt}))
 
     def updateJob(self,request):
         job=JobLocalDbView.objects.filter(Q(id=request.POST.get("id")))[0] #Lesson django,orm querry whith OR

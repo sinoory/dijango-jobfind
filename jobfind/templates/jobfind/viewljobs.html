@@ -83,6 +83,36 @@
             }); 
 
             }
+            function updateSendDate(jobid){
+                d = new Date()
+                m = d.getMonth()+1 
+                ds = m<9 ? "0"+m : ""+m
+                ds = d.getDay()<9 ? ds+"0"+d.getDay() : ds+""+d.getDay()
+                ds = (d.getFullYear()+"").substr(2,2)+ds
+                postdata={
+                    cmd:"UPDATE_SENDDATA",
+                    id:jobid,
+                    sendate:ds
+                }
+             var aj = $.ajax( { 
+                type:'post',
+                cache:'false',
+                data:postdata,
+                success:function(data){
+                   //dbg(data)
+                   rs=JSON.parse(data)
+                   //dbg("got #trcnt"+jobid)
+                   $("#trcnt"+jobid).text(rs.sendcnt+"")
+                   $("#sendate"+jobid).text(ds)
+                },
+                error:function(){
+                    dbg("update error");
+                },
+
+            }); 
+
+            }
+
             var lastClickedTrid=-1
             function changeTrBackColor(trid){
                 if (lastClickedTrid!=-1){

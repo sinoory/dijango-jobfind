@@ -29,11 +29,11 @@
                 <td>{{ job.state }}</td>  
                 <td>{{ job.udate }}</td>  
                 {% if job.sendate %}
-                <td><button onclick="sendresume({{job.id}})">{{ job.sendate }}</button></td>
+                <td><button id="sendate{{ job.id }}" onclick="updateSendDate({{job.id}})">{{ job.sendate }}</button></td>
                 {% else %}
-                <td><button onclick="sendresume({{job.id}})">send</button></td>
+                <td><button id="sendate{{ job.id }}" onclick="updateSendDate({{job.id}})">update</button></td>
                 {% endif %}
-                <td>{{ job.sendcnt }}</td>
+                <td id="trcnt{{ job.id }}">{{ job.sendcnt }}</td>
             </tr>
             {% endfor %}
         </table>
