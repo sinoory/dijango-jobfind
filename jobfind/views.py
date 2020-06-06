@@ -296,7 +296,8 @@ class ViewLocalJobs():
    
     def getGetResponst(self,request):
         template = loader.get_template('jobfind/viewljobs.html')
-        jobs=JobLocalDbView.objects.filter(Q(state='watch')|Q(state='get')).order_by("-id") #Lesson django,orm querry whith OR
+        jobs=JobLocalDbView.objects.filter(Q(state='watch')|Q(state='get')).order_by("coname") #Lesson django,orm querry whith OR
+        #use order_by(-column) to desc sort
         #jobs=JobL.objects.filter(state='watch')
         dbg("ViewLocalJobs getGetResponst jobs")
         context = Context({
@@ -311,7 +312,7 @@ class ViewLocalJobs():
         if(request.POST.get('cmd')=="UPDATE_JOB"):
             return self.updateJob(request)
         local=request.POST.get('local')
-        jobs=JobLocalDbView.objects.order_by("-id")
+        jobs=JobLocalDbView.objects.order_by("coname")
         if len(local)>0:
             jobs=jobs.filter(local__contains=local)  #Lesson django orm:querry with sql like :colum__xxx
 

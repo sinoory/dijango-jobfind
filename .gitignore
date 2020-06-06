@@ -5,3 +5,4 @@ tst/
 pypub
 *.sw*
 viewed_companys.hist
+.vim

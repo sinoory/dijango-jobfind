@@ -83,6 +83,16 @@
             }); 
 
             }
+            var lastClickedTrid=-1
+            function changeTrBackColor(trid){
+                if (lastClickedTrid!=-1){
+                    var tr=$("#"+lastClickedTrid)
+                    tr.css("background-color","#ffffff")
+                }
+                var tr=$("#"+trid)
+                tr.css("background-color","#cccc00")
+                lastClickedTrid=trid
+            }
             function updateJobs(){
                 var tr=$("#idtabjobs tr:gt(0):eq(0) ")
                 stopUpdate=false
