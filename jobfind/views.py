@@ -122,19 +122,25 @@ class Login51(LoginBroser):
         #print r.read()
 
 def index(request):
-    print "index in..."
-    template = loader.get_template('jobfind/b.html')
-    total=JobDbView.objects.count()
-    if total>0:
-        start=JobDbView.objects.all()[0].id
-    else:
-        start=0
-    print("index start=%d total=%d" %(start,total))
-    context = Context({
-            'start_id': start,
-            'total_rcd':total,
-                })
-    return HttpResponse(template.render(context))
+    if not request.is_ajax(): 
+        print "index in..."
+        template = loader.get_template('jobfind/b.html')
+        total=JobDbView.objects.count()
+        if total>0:
+            start=JobDbView.objects.all()[0].id
+        else:
+            start=0
+        print("index start=%d total=%d" %(start,total))
+        context = Context({
+                'start_id': start,
+                'total_rcd':total,
+                    })
+        return HttpResponse(template.render(context))
+    cmd=request.POST['cmd']
+    if cmd=="CMD_UPDATA_WG":
+        wc=JobDbView.objects.filter(Q(state='watch')).count()
+        gc=JobDbView.objects.filter(Q(state='get')).count()
+        return HttpResponse(json.dumps({"wc":wc,"gc":gc}))
 
 def login51(request):
     haslogin = 1 if _51loger.hasLogin() else 0
@@ -204,7 +210,10 @@ def modify(request,rcdid):
         if modifystatus != None and len(modifystatus)>0:#modify the id status
             j.state=modifystatus
             j.save()
-        return HttpResponse(json.dumps({"code":0}))
+
+        wc=Job.objects.filter(Q(state='watch')).count()
+        gc=Job.objects.filter(Q(state='get')).count()
+        return HttpResponse(json.dumps({"watch":wc,"get":gc}))
     except Exception,ex: 
         print Exception,':',ex
         print traceback.print_exc()
@@ -313,14 +322,35 @@ class ViewLocalJobs():
             return self.updateJob(request)
         if(request.POST.get('cmd')=="UPDATE_SENDDATA"):
             return self.updateSendDate(request)
-        local=request.POST.get('local')
-        jobs=JobLocalDbView.objects.order_by("coname")
-        if len(local)>0:
-            jobs=jobs.filter(local__contains=local)  #Lesson django orm:querry with sql like :colum__xxx
 
-        status=request.POST.get('status')
-        if len(status)>0:
-            jobs=jobs.filter(state__exact=status)
+        jobs=JobLocalDbView.objects.order_by("coname")
+        #SHOW_JOBS
+        if(request.POST.get('cmd')=="SHOW_JOBS"):
+            local=request.POST.get('local')
+            if len(local)>0:
+                jobs=jobs.filter(local__contains=local)  #Lesson django orm:querry with sql like :colum__xxx
+
+            status=request.POST.get('status')
+            if len(status)>0:
+                jobs=jobs.filter(state__exact=status)
+        
+        if(request.POST.get('cmd')=="SEARCH_COMP"):
+            coname=request.POST.get('coname')
+            if len(coname)>0:
+                jobs=jobs.filter(coname__contains=coname)  #Lesson django orm:querry with sql like :colum__xxx
+
+        context = Context({
+                'jobstatus':self.getStatusList(),
+                'joblocals':self.getLocalList(),
+                'joblist': jobs,
+                    })
+
+        return HttpResponse(template.render(context))
+
+    def updateSendDate(self,request):
+        job=JobLocalDbView.objects.filter(Q(id=request.POST.get("id")))[0]
+        job.sendate=request.POST['sendate']
+        job.sendcnt+=1
 
         context = Context({
                 'jobstatus':self.getStatusList(),

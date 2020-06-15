@@ -42,6 +42,31 @@
             }); 
 
             }
+
+            function search_company(){
+                coname=$("#idsearchkey").val()
+                //dbg("querryJobs c="+coname)
+                postdata={
+                    cmd:"SEARCH_COMP",
+                    coname:coname
+                }
+             var aj = $.ajax( { 
+                type:'post',
+                cache:'false',
+                data:postdata,
+                success:function(data){
+                   $("#idivtable").html(data)
+                   //$("#idstatus").val(lastStatus)
+                   //$("#idlocal").val(lastLocal)
+                },
+                error:function(){
+                    dbg("stop error");
+                },
+
+            }); 
+
+            }
+
             var stopUpdate=false
             function stopUpdatejob(){
                 stopUpdate=true
@@ -67,6 +92,7 @@
                     data=JSON.parse(data)
                     if(data.res=="updated"){
                         tr.css("background-color","#99D3FF")
+                        $("#udate"+postdata.id).text(data.newDate)
                     }else{
                         tr.css("background-color","#ffffff")
                     }
@@ -87,7 +113,7 @@
                 d = new Date()
                 m = d.getMonth()+1 
                 ds = m<9 ? "0"+m : ""+m
-                ds = d.getDay()<9 ? ds+"0"+d.getDay() : ds+""+d.getDay()
+                ds = d.getDate()<9 ? ds+"0"+d.getDate() : ds+""+d.getDate()
                 ds = (d.getFullYear()+"").substr(2,2)+ds
                 postdata={
                     cmd:"UPDATE_SENDDATA",
@@ -99,7 +125,7 @@
                 cache:'false',
                 data:postdata,
                 success:function(data){
-                   //dbg(data)
+                   //dbg(data+",ds="+ds)
                    rs=JSON.parse(data)
                    //dbg("got #trcnt"+jobid)
                    $("#trcnt"+jobid).text(rs.sendcnt+"")
@@ -140,6 +166,8 @@
         <a href="/jobfind/querry">go querry</a>
         <button onclick='updateJobs()'>update jobs</button>
         <button onclick='stopUpdatejob()'>stop update jobs</button>
+        <button onclick='search_company()'>search company</button>
+        <input type='text' id='idsearchkey'>
         <div id='idivtable'>
         {% include 'jobfind/viewljobs_table.html' %} <!-- Lesson django template: keep the same dir for included html with in the views.py , otherwith error 500 happend -->
         </div>

@@ -134,6 +134,7 @@
                 success:function(data){
                     dbg("ok,data="+data) 
                     $("#jstate").text(newstatus)
+                    $("#idwgcnt").text(data)
                 },
                 error:function(){
                     dbg("error");
@@ -231,6 +232,7 @@
         <input type='text' id='idfiltersalary' value="15000-19999/月" ></input>
         <button onclick='prevjob()'>prevjob</button>
         <button onclick='nextjob()'>nextjob</button>
+        <span id="idwgcnt"></span>
 
         <!--
         <button onclick='test()'>test2</button>

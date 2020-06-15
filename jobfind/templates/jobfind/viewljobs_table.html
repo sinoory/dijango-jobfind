@@ -2,6 +2,7 @@
         <table id='idtabjobs'>        
             <tr>
                 <td>job</td>              
+                <td>salary</td>          
                 <td>company</td>          
                 <td>
                     <select id='idlocal' onchange="querryJobs()">
@@ -24,10 +25,11 @@
             {% for job in joblist %}  
             <tr id='{{job.id}}' onclick="changeTrBackColor({{job.id}})">          
                 <td><a href='{{ job.jobu }}' target='_blank'  >{{ job.job |slice:"20" }}</a></td>
+                <td>{{ job.salary }}</td>
                 <td><a href='{{job.courl}}' target='_blank' >{{ job.coname |slice:"20"}}</a></td>                                                            
                 <td>{{ job.local }}</td>  
                 <td>{{ job.state }}</td>  
-                <td>{{ job.udate }}</td>  
+                <td id="udate{{ job.id }}" >{{ job.udate }}</td>  
                 {% if job.sendate %}
                 <td><button id="sendate{{ job.id }}" onclick="updateSendDate({{job.id}})">{{ job.sendate }}</button></td>
                 {% else %}
