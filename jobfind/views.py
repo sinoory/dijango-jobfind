@@ -63,7 +63,9 @@ def timerUpdateRecentCmpanys():
         #print "timerUpdateRecentCmpanys cur cmpny=",len(_51loger.cl_viewd_cmps["hs"])
     except Exception,ex:
         print "timerUpdateRecentCmpanys e=",ex
-    threading.Timer(120,timerUpdateRecentCmpanys).start()
+    h=time.localtime().tm_hour
+    sleepcnt = 120 if h>=8 and h<=20 else 1800
+    threading.Timer(sleepcnt,timerUpdateRecentCmpanys).start()
 
 if __name__=="__main__" :
     _51loger.getRecentCmpanys()
@@ -313,6 +315,7 @@ class ViewLocalJobs():
                 'jobstatus':self.getStatusList(),
                 'joblocals':self.getLocalList(),
                 'joblist': jobs,
+                'cnt':jobs.count(),
                     })
         return HttpResponse(template.render(context))
     def getPostResponse(self,request):
@@ -338,11 +341,13 @@ class ViewLocalJobs():
             coname=request.POST.get('coname')
             if len(coname)>0:
                 jobs=jobs.filter(coname__contains=coname)  #Lesson django orm:querry with sql like :colum__xxx
+        print(request.POST.get('cmd'),"total=",jobs.count())
 
         context = Context({
                 'jobstatus':self.getStatusList(),
                 'joblocals':self.getLocalList(),
                 'joblist': jobs,
+                'cnt':jobs.count(),
                     })
 
         return HttpResponse(template.render(context))

@@ -144,9 +144,11 @@
                 if (lastClickedTrid!=-1){
                     var tr=$("#"+lastClickedTrid)
                     tr.css("background-color","#ffffff")
+                    tr.css("font-weight","")
                 }
                 var tr=$("#"+trid)
                 tr.css("background-color","#cccc00")
+                tr.css("font-weight","bold")
                 lastClickedTrid=trid
             }
             function updateJobs(){
