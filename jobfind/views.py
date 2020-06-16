@@ -325,6 +325,8 @@ class ViewLocalJobs():
             return self.updateJob(request)
         if(request.POST.get('cmd')=="UPDATE_SENDDATA"):
             return self.updateSendDate(request)
+        if(request.POST.get('cmd')=="UPDATE_STATUS"):
+            return self.updateStatus(request)
 
         jobs=JobLocalDbView.objects.order_by("coname")
         #SHOW_JOBS
@@ -356,21 +358,14 @@ class ViewLocalJobs():
         job=JobLocalDbView.objects.filter(Q(id=request.POST.get("id")))[0]
         job.sendate=request.POST['sendate']
         job.sendcnt+=1
-
-        context = Context({
-                'jobstatus':self.getStatusList(),
-                'joblocals':self.getLocalList(),
-                'joblist': jobs,
-                    })
-
-        return HttpResponse(template.render(context))
-
-    def updateSendDate(self,request):
-        job=JobLocalDbView.objects.filter(Q(id=request.POST.get("id")))[0]
-        job.sendate=request.POST['sendate']
-        job.sendcnt+=1
         job.save()
         return HttpResponse(json.dumps({"res":1,"sendcnt":job.sendcnt}))
+
+    def updateStatus(self,request):
+        job=JobLocalDbView.objects.filter(Q(id=request.POST.get("id")))[0]
+        job.state=request.POST['status']
+        job.save()
+        return HttpResponse(json.dumps({"res":1,"status":job.state}))
 
     def updateJob(self,request):
         job=JobLocalDbView.objects.filter(Q(id=request.POST.get("id")))[0] #Lesson django,orm querry whith OR

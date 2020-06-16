@@ -28,7 +28,7 @@
                 <td>{{ job.salary }}</td>
                 <td><a href='{{job.courl}}' target='_blank' >{{ job.coname |slice:"20"}}</a></td>                                                            
                 <td>{{ job.local }}</td>  
-                <td>{{ job.state }}</td>  
+                <td id="st{{ job.id }}" >{{ job.state }}</td>  
                 <td id="udate{{ job.id }}" >{{ job.udate }}</td>  
                 {% if job.sendate %}
                 <td><button id="sendate{{ job.id }}" onclick="updateSendDate({{job.id}})">{{ job.sendate }}</button></td>

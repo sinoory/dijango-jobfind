@@ -139,6 +139,46 @@
 
             }
 
+        _current_job_id=-1
+        function keyDown(e) { 
+            var keycode = e.which; 
+            lastArrowKey=keycode;
+            var realkey = String.fromCharCode(e.which); 
+            var t="keycode: " + keycode + " charcode: " + realkey;
+                newstatus=""
+                if(keycode==78){//N:null
+                    newstatus="null"
+                }else if(keycode==71){//G:get
+                    newstatus="get"
+                }else if(keycode==87){//W:
+                    newstatus="watch"
+                }
+                if(newstatus.length>0)
+                    modifyStatus(lastClickedTrid,newstatus)
+        } 
+        document.onkeydown = keyDown;
+         function modifyStatus(id,newstatus){
+            postdata={
+                cmd:"UPDATE_STATUS",
+                id:id,
+                status:newstatus,
+            }
+             var aj = $.ajax( { 
+                type:'post',
+                cache:'false',
+                data:postdata,
+                success:function(data){
+                    dbg("ok,data="+data) 
+                    $("#st"+id).text(newstatus)
+                },
+                error:function(){
+                    dbg("error");
+                },
+
+            }); 
+       }
+
+
             var lastClickedTrid=-1
             function changeTrBackColor(trid){
                 if (lastClickedTrid!=-1){
