@@ -205,17 +205,34 @@ def detail(request, poll_id):
 def modify(request,rcdid):
     print "modify(%s) in..." %rcdid
     try:
-        j=Job.objects.get(id=int(rcdid))
-        modifystatus=request.POST.get('status')
-        print "modifystatus=%s" %(modifystatus)
-        #print "detail(%d)" %(int(poll_id))
-        if modifystatus != None and len(modifystatus)>0:#modify the id status
-            j.state=modifystatus
-            j.save()
+        def changeStatus(db,request):
+            j=db.objects.get(id=int(rcdid))
+            modifystatus=request.POST.get('status')
+            print "modifystatus=%s" %(modifystatus)
+            #print "detail(%d)" %(int(poll_id))
+            if modifystatus != None and len(modifystatus)>0:#modify the id status
+                j.state=modifystatus
+                j.save()
 
-        wc=Job.objects.filter(Q(state='watch')).count()
-        gc=Job.objects.filter(Q(state='get')).count()
-        return HttpResponse(json.dumps({"watch":wc,"get":gc}))
+            wc=db.objects.filter(Q(state='watch')).count()
+            gc=db.objects.filter(Q(state='get')).count()
+            return HttpResponse(json.dumps({"watch":wc,"get":gc}))
+
+        def updateSendDate(db,request):
+            job=db.objects.filter(Q(id=request.POST.get("id")))[0]
+            job.sendate=request.POST['sendate']
+            job.sendcnt+=1
+            job.save()
+            return HttpResponse(json.dumps({"res":1,"sendcnt":job.sendcnt}))
+        if request.POST.get('db')=='db_get' :
+            db=Job
+        elif request.POST.get('db')=='db_local' :
+            db=JobLocalDbView
+        if(request.POST.get('cmd')=="CMD_CHANGE_STATUS"):
+            return changeStatus(db,request)
+        if(request.POST.get('cmd')=="CMD_UPDATE_SENDDATA"):
+            return updateSendDate(db,request)
+
     except Exception,ex: 
         print Exception,':',ex
         print traceback.print_exc()
@@ -307,7 +324,7 @@ class ViewLocalJobs():
    
     def getGetResponst(self,request):
         template = loader.get_template('jobfind/viewljobs.html')
-        jobs=JobLocalDbView.objects.filter(Q(state='watch')|Q(state='get')).order_by("coname") #Lesson django,orm querry whith OR
+        jobs=JobLocalDbView.objects.filter(Q(state='watch')|Q(state='get')).order_by("-udate").order_by("coname") #Lesson django,orm querry whith OR
         #use order_by(-column) to desc sort
         #jobs=JobL.objects.filter(state='watch')
         dbg("ViewLocalJobs getGetResponst jobs")

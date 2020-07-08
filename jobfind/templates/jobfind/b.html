@@ -97,6 +97,7 @@
                     //Lesson:json: use eval convert string to json object,and  also change unicaode(\ue342 ...) to utf8
                     job=eval ("(" + data + ")"); 
                     $("#idsalary").html(job.salary);
+                    $("#idundef").html(job.sendate)
                     if(!isJobOk(job)){
                         emulateKeyDown();
                         return;
@@ -121,9 +122,43 @@
             }); 
             localStorage.lastIndex=id
        }
+
+            function updateSendDate(){
+                d = new Date()
+                m = d.getMonth()+1 
+                ds = m<9 ? "0"+m : ""+m
+                ds = d.getDate()<9 ? ds+"0"+d.getDate() : ds+""+d.getDate()
+                ds = (d.getFullYear()+"").substr(2,2)+ds
+                postdata={
+                    cmd:"CMD_UPDATE_SENDDATA",
+                    id:current,
+                    db:"db_get",
+                    sendate:ds
+                }
+             var aj = $.ajax( { 
+                type:'post',
+                url:"modify/"+current+"/",
+                cache:'false',
+                data:postdata,
+                success:function(data){
+                   rs=JSON.parse(data)
+                   //dbg("got #trcnt"+jobid)
+                   $("#idundef").html(ds)
+                },
+                error:function(){
+                    dbg("update error");
+                },
+
+            }); 
+
+            }
+
+
         document.onkeydown = keyDown;
          function modifyStatus(id,newstatus){
             postdata={
+                cmd : "CMD_CHANGE_STATUS",
+                db:"db_get",
                 status:newstatus,
             }
              var aj = $.ajax( { 
@@ -232,6 +267,7 @@
         <input type='text' id='idfiltersalary' value="15000-19999/月" ></input>
         <button onclick='prevjob()'>prevjob</button>
         <button onclick='nextjob()'>nextjob</button>
+        <button onclick='updateSendDate()'>updateSendDate</button>
         <span id="idwgcnt"></span>
 
         <!--
