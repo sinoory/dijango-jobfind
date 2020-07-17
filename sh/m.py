@@ -136,15 +136,16 @@ class Job51Adder():
         while(loop<=endpage or endpage==-1):
             jobs=UNDEFINDED
             try:
-                jobs,url=self.addOnePageJob(keyword,jobarea,issuedate,loop)
+                jobs,url,totalpage=self.addOnePageJob(keyword,jobarea,issuedate,loop)
             except Exception,ex:
                 err= "Exception ex=%s in addOnePageJob ,saved data in Error.txt" %(ex)
                 print err
                 saveFile("%s\n" %(err),"Error.txt",'a')
                 print traceback.print_exc()
                
-            if jobs==0 :
-                print "Exit,No job in page "+url
+            print "addJob<<<<<<",loop,totalpage
+            if loop>=totalpage :
+                print loop,totalpage, "reach page end "+url
                 self.mFinishReason="REACH_END"
                 break;            
             elif jobs==USER_STOPED or self.userStopped:
@@ -170,7 +171,8 @@ class Job51Adder():
         #here the data from HtmlReader is already utf8,not meta gb2312,so pass utf-8 to its construct to force encoding,
         #otherwise the BeautifulSoup can't work
         soup=BeautifulSoup(reader.outdata,fromEncoding="gbk")
-        print "process %s" %pagesearchurl
+        ttcnt=soup.findAll("input",{"id":"hidTotalPage"})[0].get("value")
+        print ttcnt, "process page %s" %pagesearchurl
         #print soup.findAll("ul",{"class":"dict-basic-ul"})[0].li.strong.string 
         #find the table firest ,then find the job items
         #a itme looks like : checkbox jobname companyname locate udatedata
@@ -228,7 +230,7 @@ class Job51Adder():
                 print ("Exist %s, ignore" %(job))
 
             cnt=cnt+1
-        return cnt,pagesearchurl
+        return cnt,pagesearchurl,int(ttcnt)
         #jbo.showAll()
 
     def getDescript(self,joburl):

@@ -10,6 +10,10 @@
         function dbg(msg){
             $("#console").html(msg+"<br>"+$("#console").html());
         }
+        function del_selected_key(){
+            //document.getElementById("idhistorykey").options.remove($("#idhistorykey").get(0).selectedIndex); 
+            mHistoryOks.rmCurKey()
+        }
         function startquerry(){
             curCmd.onStart()
             querry()
@@ -517,6 +521,7 @@
 </select>
 <textarea cols="20" rows="1" id="idsearchkey"></textarea>
 history<select id='idhistorykey' onchange="$('#idsearchkey').val($('#idhistorykey').val())" ><select>
+<button onclick='del_selected_key()'>delete selected key</button>
 
 
 <select id='idselCompanys' onchange='oncompanychanged()' style="display: none" >
