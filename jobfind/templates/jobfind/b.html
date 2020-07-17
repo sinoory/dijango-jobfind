@@ -24,7 +24,6 @@
         function dbg(msg){
             $("#console").text(msg);
         }
-       
         function emulateKeyDown(keycode){
             keyDown({which:lastArrowKey});
         }
@@ -181,6 +180,18 @@
             alert(str)
        }
         $(document).ready(function(){
+            $(document).bind("contextmenu",function(e){
+                return false;
+            });
+            $("#idivJob").mousedown(function(e) {
+                if (3 == e.which) {//right
+                    prevjob()
+                } else if (1 == e.which) {
+                    nextjob()
+                }
+            })
+
+
             startId={{start_id}}; //template variables
             totalRcd={{total_rcd}};
             if(typeof localStorage.lastIndex == "undefined"){ //Lesson js html5:localstorage judge undefined value
