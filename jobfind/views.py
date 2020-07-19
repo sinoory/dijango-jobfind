@@ -7,11 +7,13 @@ sys.path.append(os.path.join(os.path.dirname(__file__),"../pypub/utility"))
 sys.path.append(os.path.join(os.path.dirname(__file__),"../pypub/web"))
 
 from uty import *
+from datetime import datetime
 from webLogin import LoginBroser
 from getPage import HtmlReader
 from bs4 import BeautifulSoup
+from pyquery import PyQuery as pq
 import urllib,os
-import json
+import json,re
 import threading
 _ck = "guid=7cf733caa27fadb740860c3099054403; nsearch=jobarea%3D%26%7C%26ord_field%3D%26%7C%26recentSearch0%3D%26%7C%26recentSearch1%3D%26%7C%26recentSearch2%3D%26%7C%26recentSearch3%3D%26%7C%26recentSearch4%3D%26%7C%26collapse_expansion%3D; _ujz=MjQ4ODkwNTcw; slife=lowbrowser%3Dnot%26%7C%26lastlogindate%3D20200520%26%7C%26securetime%3DDTFVY1Y4WDUDaFZsDDIKY1VjVmY%253D; partner=0_0_0_0; search=jobarea%7E%60020000%7C%21ord_field%7E%600%7C%21recentSearch0%7E%60020000%A1%FB%A1%FA000000%A1%FB%A1%FA0000%A1%FB%A1%FA00%A1%FB%A1%FA99%A1%FB%A1%FA%A1%FB%A1%FA99%A1%FB%A1%FA99%A1%FB%A1%FA99%A1%FB%A1%FA99%A1%FB%A1%FA9%A1%FB%A1%FA99%A1%FB%A1%FA%A1%FB%A1%FA0%A1%FB%A1%FA%C1%FA%C6%EC%A1%FB%A1%FA1%A1%FB%A1%FA1%7C%21recentSearch1%7E%60020000%A1%FB%A1%FA000000%A1%FB%A1%FA0000%A1%FB%A1%FA00%A1%FB%A1%FA99%A1%FB%A1%FA%A1%FB%A1%FA99%A1%FB%A1%FA99%A1%FB%A1%FA99%A1%FB%A1%FA99%A1%FB%A1%FA9%A1%FB%A1%FA99%A1%FB%A1%FA%A1%FB%A1%FA0%A1%FB%A1%FA%C1%FA%C6%EC%A1%FB%A1%FA2%A1%FB%A1%FA1%7C%21recentSearch2%7E%60020000%A1%FB%A1%FA000000%A1%FB%A1%FA0000%A1%FB%A1%FA00%A1%FB%A1%FA99%A1%FB%A1%FA%A1%FB%A1%FA99%A1%FB%A1%FA99%A1%FB%A1%FA99%A1%FB%A1%FA99%A1%FB%A1%FA9%A1%FB%A1%FA99%A1%FB%A1%FA%A1%FB%A1%FA0%A1%FB%A1%FA%D6%D0%C8%ED%B9%FA%BC%CA%BF%C6%BC%BC%B7%FE%CE%F1%D3%D0%CF%DE%B9%AB%CB%BE%A1%FB%A1%FA2%A1%FB%A1%FA1%7C%21recentSearch3%7E%60020000%A1%FB%A1%FA000000%A1%FB%A1%FA0000%A1%FB%A1%FA00%A1%FB%A1%FA99%A1%FB%A1%FA%A1%FB%A1%FA99%A1%FB%A1%FA99%A1%FB%A1%FA99%A1%FB%A1%FA99%A1%FB%A1%FA9%A1%FB%A1%FA99%A1%FB%A1%FA%A1%FB%A1%FA0%A1%FB%A1%FAAndroid%A1%FB%A1%FA2%A1%FB%A1%FA1%7C%21recentSearch4%7E%60020000%A1%FB%A1%FA000000%A1%FB%A1%FA0000%A1%FB%A1%FA00%A1%FB%A1%FA99%A1%FB%A1%FA%A1%FB%A1%FA99%A1%FB%A1%FA99%A1%FB%A1%FA99%A1%FB%A1%FA99%A1%FB%A1%FA9%A1%FB%A1%FA99%A1%FB%A1%FA%A1%FB%A1%FA0%A1%FB%A1%FAtcl%A1%FB%A1%FA2%A1%FB%A1%FA1%7C%21; ps=needv%3D0; 51job=cuid%3D24889057%26%7C%26cusername%3Dsinoory%26%7C%26cpassword%3D%26%7C%26cname%3D%25CD%25F5%25B4%25DE%26%7C%26cemail%3Dsinoory%2540126.com%26%7C%26cemailstatus%3D3%26%7C%26cnickname%3Dsinoory%26%7C%26ccry%3D.0ETBlTAgdF3.%26%7C%26cconfirmkey%3DsiWoRCbHJRF36%26%7C%26cautologin%3D1%26%7C%26cenglish%3D0%26%7C%26sex%3D0%26%7C%26cnamekey%3DsihiQfuRPViHs%26%7C%26to%3D8b2f01c27406249ec559ccc50ff52b745ec52e57%26%7C%26"
 class CookieLogin51(object):
@@ -24,6 +26,8 @@ class CookieLogin51(object):
             with open("viewed_companys.hist","r") as f :
                 hist = f.read()
                 self.cl_viewd_cmps = json.loads(hist)
+        self.resume_status = {}
+        self.cl_last_resume_time=None
     def hasLogin(self):
         url="https://i.51job.com/userset/resume_browsed.php?lang=c"
         rd=HtmlReader(url,cookie=self.cl_cookieStr)
@@ -38,6 +42,54 @@ class CookieLogin51(object):
         return "CookieLogin51 no img but want cookie"
     def Login(self,kvs):
         return
+    def getResumeStates(self):
+        n = datetime.now()
+        if self.cl_last_resume_time != None :
+            if n.hour == self.cl_last_resume_time.hour :
+                return
+        self.cl_last_resume_time = n
+        url="http://i.51job.com/userset/my_apply.php?lang=c&type=sh&tagType=all&page=1"
+        rd=HtmlReader(url,cookie=self.cl_cookieStr)
+        rd.run()
+        d=pq(rd.outdata.decode("gbk"))
+        total_txt = d("div.p_in span.td").text() #共7页，到第 页
+        pgcnt = int(re.findall(r'\d{1,}',total_txt)[0])
+        print total_txt, pgcnt
+        res={}
+        for pg in range(1,pgcnt+1) :
+            url = "http://i.51job.com/userset/my_apply.php?lang=c&type=sh&tagType=all&page=%d" %pg
+            print "processing page",pg,":",pgcnt
+            rd=HtmlReader(url,cookie=self.cl_cookieStr)
+            rd.run()
+            d=pq(rd.outdata.decode("gbk"))
+            jobs = d("div.apox div.e").items()
+            #jobs = d("div.e.cye-lm-tag").items()
+
+            for j in jobs :
+                cn,cu = j("a.gs").text(),j("a.gs").attr.href
+                holders = j("div.c_light_blue span").text()
+                jn,ju = j("a.zhn").text(),j("a.zhn").attr.href
+                jid = j("div.hpBox.h_orange input").attr.value
+
+                sturl = "http://i.51job.com/userset/ajax/apply.php?0.431294613asd23&jsoncallback=jQuery1830180sdf8044798423_1594959626386&cvinfo%5B"+jid+"%5D%5Bcvlogid%5D="+jid+"&cvinfo%5B"+jid+"%5D%5Btime%5D=1594868734&cvinfo%5B"+jid+"%5D%5Bpass%5D=1"
+                rd=HtmlReader(sturl,cookie=self.cl_cookieStr)
+                rd.run()
+                js = json.loads(rd.outdata.decode("gbk")[41:-1])
+                for k,v in js['html'].items() :
+                    dt = pq(v)
+                    status = dt("label:last").text()
+                jid = re.findall('\d{5,}',ju)[0]
+                res[jid]={"jn":jn,"ju":ju,"holders":holders,"jid":jid,"status":status,"cn":cn,"cu":cu}
+                print jn,cn,"\n",status,holders
+        self.resume_status = res
+        return res
+        print "finish url"
+        for r in res.values() :
+            print r['jn'],r['cn'],"\n",r['status'],r['holders']
+
+
+
+
 
     def getRecentCmpanys(self,number=5):
         url="https://i.51job.com/userset/resume_browsed.php?lang=c"
@@ -68,7 +120,7 @@ def timerUpdateRecentCmpanys():
     threading.Timer(sleepcnt,timerUpdateRecentCmpanys).start()
 
 if __name__=="__main__" :
-    _51loger.getRecentCmpanys()
+    _51loger.getResumeStates()
     pass
 
 
@@ -339,6 +391,7 @@ class ViewLocalJobs():
         template = loader.get_template('jobfind/viewljobs_table.html')
         print request.POST
         if(request.POST.get('cmd')=="UPDATE_JOB"):
+            _51loger.getResumeStates()
             return self.updateJob(request)
         if(request.POST.get('cmd')=="UPDATE_SENDDATA"):
             return self.updateSendDate(request)
@@ -390,11 +443,18 @@ class ViewLocalJobs():
         jobAdder.setQuerryDict(qd)
         update=jobAdder.getUpdate(job.jobu)
         updateres="not_update"
+        #updateres="updated"
         if update!=job.udate:
             job.udate=update
             job.save()
             updateres="updated"
-        return HttpResponse(json.dumps({"res":updateres,"newDate":update}))
+        rsmSt = ""
+        jid = re.findall('\d{5,}',job.jobu)[0]
+        print jid,job.jobu,job.job,jid in _51loger.resume_status
+        if jid in _51loger.resume_status.keys() :
+            rsmSt = _51loger.resume_status[jid]['status']+_51loger.resume_status[jid]['holders']
+            print "======================",rsmSt,jid
+        return HttpResponse(json.dumps({"res":updateres,"newDate":update,"rs":rsmSt}))
         #jobs=JobLocalDbView.objects.filter(Q(state='watch')|Q(state='get')) #Lesson django,orm querry whith OR
         #return HttpResponse(json.dumps({"code":"post local"}))
   
